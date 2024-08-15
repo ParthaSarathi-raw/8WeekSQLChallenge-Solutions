@@ -236,6 +236,77 @@ WHERE dn = 1;
 | B           | sushi                                         |
 
 ---
+**8) What is the total items and amount spent for each member before they became a member?**
+```` sql
+SELECT customer_id,
+       COUNT(product_name) AS total_items,
+       SUM(price) AS total_amount_spent
+FROM cte
+WHERE order_date < join_date
+GROUP BY customer_id
+ORDER BY customer_id;
+````
+#### Output Table
+
+| customer_id | total_items | total_amount_spent |
+| ----------- | ----------- | ------------------ |
+| A           | 2           | 25                 |
+| B           | 3           | 40                 |
+
+---
+**9) If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
+
+```` sql
+SELECT customer_id,
+       SUM(
+           CASE 
+               WHEN product_name = 'sushi' THEN price * 20
+               ELSE price * 10
+           END
+       ) AS points
+FROM cte
+GROUP BY customer_id
+ORDER BY customer_id;
+````
+#### Output Table
+
+| customer_id | points |
+| ----------- | ------ |
+| A           | 860    |
+| B           | 940    |
+| C           | 360    |
+
+---
+
+**10) In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+```` sql
+SELECT customer_id,
+       SUM(
+           CASE 
+               WHEN (
+                   (order_date - join_date BETWEEN 0 AND 6)
+                   OR (product_name = 'sushi')
+               ) THEN 20 * price
+               ELSE 10 * price
+           END
+       ) AS total_points
+FROM cte
+WHERE order_date < '2021-02-01'
+  AND customer_id != 'C'
+GROUP BY customer_id
+ORDER BY customer_id;
+````
+#### Output Table
+
+| customer_id | total_points |
+| ----------- | ------------ |
+| A           | 1370         |
+| B           | 820          |
+
+---
+
+#### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+#### Anyways Happy Fiddling with the Data. See You in the next case study.
 
 
 
