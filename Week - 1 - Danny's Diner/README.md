@@ -65,7 +65,7 @@ ORDER BY
 ---
 
 **2) How many days has each customer visited the restaurant?**
-### Approach 1 : Using Distinct Keyword
+#### Approach 1 : Using Distinct Keyword
 ```` sql
 SELECT 
     customer_id,
@@ -77,7 +77,7 @@ GROUP BY
 ````
 
 
-### Approach 2 : Without Distinct Keyword
+#### Approach 2 : Without Distinct Keyword
 ```` sql
 SELECT customer_id,
        COUNT(*)
@@ -102,7 +102,7 @@ ORDER BY customer_id;
 
 ---
 **3) What was the first item from the menu purchased by each customer?**
-### Approach 1 : Using Dense Rank
+#### Approach 1 : Using Dense Rank
 ```` sql
 SELECT DISTINCT customer_id,
                 product_name AS first_item_purchased
@@ -114,7 +114,7 @@ FROM (
 ) temp
 WHERE dn = 1;
 ````
-### Approach 2 : Using Joins
+#### Approach 2 : Using Joins
 ```` sql
 SELECT cte.customer_id,
        product_name AS first_item_ordered
