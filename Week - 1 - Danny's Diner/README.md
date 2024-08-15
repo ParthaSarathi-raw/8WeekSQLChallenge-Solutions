@@ -1,9 +1,21 @@
 # Case Study - 1 : Danny's Diner
 
-All the data and questions that I've answered in this page can be found at  [here](https://8weeksqlchallenge.com/case-study-1/)
+All the data and questions that I've answered in this page can be found at  [Dannys Website](https://8weeksqlchallenge.com/case-study-1/)
 
-And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/138) using POSTGRE SQL V 13. If you get any kind of errors when you are executing my queries given below, you might be using some other dialect of SQL other than postgre sql v 13. Please look up alternate ways to achieve the same thing on your SQL dialect. However I do prefer just practising these questions on DB Fiddle.
+And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com/f/2rM8RAnq7h5LLDTzZiRWcd/138) using POSTGRE SQL V 13. If you get any kind of errors when you are executing my queries given below, you might be using some other dialect of SQL other than postgre sql v 13. Please look up alternate ways to achieve the same thing on your SQL dialect. However I do prefer just practising these questions on DB Fiddle itself.
 
+**You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem**
+
+## Entity Relationship Diagram
+![image](https://github.com/user-attachments/assets/f1971f06-eba6-4976-9294-0ed5b94d5621)
+
+Based on the ER diagram, we can clearly see that there are three tables. The sales table is directly connected to both the members table and the menu table. So, instead of performing the join operation in every query, can we just create a CTE (Common Table Expression) that has all the tables joined? The answer is yes, but the question is how are we going to join them, and what type of join should we use?
+
+Well, the most straightforward approach is to perform an INNER JOIN between sales and members, and then another INNER JOIN between sales and menu. But is that correct?
+
+You see, there might be some customers who have joined the loyalty program but haven’t ordered anything, or vice versa. At the same time, there might be some products on the menu that have never been ordered.
+
+I know that for this case study, the dataset is small, and just by looking at the data, we can rule out these edge cases. But remember, Danny just gave us a sample of the dataset due to privacy issues. Hence, it is always better to write queries for the general case, taking these edge cases into consideration.
 ## Creation of CTE
 We will be using this CTE table as the base table to answer all the questions.
 
@@ -40,8 +52,12 @@ SELECT * FROM cte;
 
 ## Solutions
 
-**1) What is the total amount each customer spent at the restaurant?**
+**1) What is the total amount each customer spent at the restaurant?**\
 
+- For total amount `sum(price)`
+- For each customer `GROUP BY customer_id `
+- Combining everything we get the final query
+#### Final Query 
 ```` sql
 SELECT 
     customer_id,
@@ -66,6 +82,10 @@ ORDER BY
 
 **2) How many days has each customer visited the restaurant?**
 #### Approach 1 : Using Distinct Keyword
+- For no_of_days `count(distinct order_date)`. Notice that we use distinct keyword because for each order_date, there could be multiple orders. So we ideally want to count that order_date once only.
+- For every customer `group by customer_id`
+- Combining everything we get the final query
+#### Final Query
 ```` sql
 SELECT 
     customer_id,
@@ -78,6 +98,13 @@ GROUP BY
 
 
 #### Approach 2 : Without Distinct Keyword
+- I wouldn't recommend this method because it is a bit lenghty and this question can be solved simply by using distinct keyword. But just know this logic because these logics can be applied anywhere.
+- For each customer and on each specific `order_date`, there might be multiple orders, so first we want to combine all the orders on a specific date to a single row. So here we will use `group by customer_id` as well as `order_date`.
+```` sql
+SELECT customer_id,order_date FROM cte group by customer_id,order_date;
+````
+- Now that we got all distinct customer_id and order_id, now all we need to do is `group by customer_id` again by applying `count(order_date) or count(*)` by passing this above query as sub-query.
+#### Final Query
 ```` sql
 SELECT customer_id,
        COUNT(*)
