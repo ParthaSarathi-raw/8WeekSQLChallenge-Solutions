@@ -650,6 +650,7 @@ SELECT generate_series(
 ) AS first_of_month;
 ````
 Generate_Series Output :
+<br>
 ![image](https://github.com/user-attachments/assets/cb8ed405-8d49-4e16-bcbe-e412afeadef5)
 - Next I want you to take a look at this table
 ```` sql
