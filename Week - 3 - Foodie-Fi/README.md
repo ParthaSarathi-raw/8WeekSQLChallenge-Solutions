@@ -321,14 +321,13 @@ ORDER BY
 
 ---
 
-**7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?**
+**7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?**\
 Before going to the solution I want you to try this problem for a couple more minutes, because  this is a bit tricky and I can assure you that when you get the correct solution yourself it feels pretty good.\
 If you didn’t get the answer, no worries, we are here to learn after all.\
 So we want the customer count and percentage breakdown for all 5 plan_names before the year 2021. So can we just put a where condition to eliminate all the plans that are after the end of 2020.\
 But even after applying the condition we will have all the previous plans that the customer had used. But we only want to know the latest plan the customer was using as of before end of 2020.
 - So we can use `row_number()` and `order by start_date DESC` to get the latest plan to be marked by `rn 1`.
-
-#### Final Query
+```` sql
 SELECT 
     cte.*, 
     ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY start_date DESC) AS rn
@@ -336,21 +335,143 @@ FROM
     CTE
 WHERE 
     start_date < '2020-12-31';
+````
+Now we can filter out the latest plan by putting `rn = 1`.\
+Now all we gotta do is count and find percentage of each plan_id just like previous question. So here is the query since you’re already familiar with this kind of concept.
+
+#### Final Query
+```` sql
+SELECT 
+    plan_id, 
+    plan_name, 
+    COUNT(*) AS count, 
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 1) AS percentage
+FROM (
+    SELECT 
+        cte.*, 
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY start_date DESC) AS rn
+    FROM 
+        cte
+    WHERE 
+        start_date <= '2020-12-31'
+) temp
+WHERE 
+    rn = 1
+GROUP BY 
+    plan_id, 
+    plan_name;
+````
 
 #### Output Table
  
+| plan_id | plan_name     | count | percentage |
+| ------- | ------------- | ----- | ---------- |
+| 0       | trial         | 19    | 1.9        |
+| 1       | basic monthly | 224   | 22.4       |
+| 2       | pro monthly   | 326   | 32.6       |
+| 3       | pro annual    | 195   | 19.5       |
+| 4       | churn         | 236   | 23.6       |
+
+Now I want you to answer the same question using lead/lag functions. Can you do it?
+Here is the solution using Lead() if you’re stuck trying to find alternate approach. Based on lead() hope you can build the solution using LAG() as well.
+
+```` sql
+SELECT 
+    plan_id, 
+    plan_name, 
+    SUM(CASE 
+            WHEN (next_date IS NULL OR EXTRACT(year FROM next_date) > 2020) 
+            THEN 1 
+            ELSE 0 
+        END) AS count,
+    ROUND(
+        100.0 * SUM(CASE 
+                        WHEN (next_date IS NULL OR EXTRACT(year FROM next_date) > 2020) 
+                        THEN 1 
+                        ELSE 0 
+                    END) / 
+        SUM(SUM(CASE 
+                    WHEN (next_date IS NULL OR EXTRACT(year FROM next_date) > 2020) 
+                    THEN 1 
+                    ELSE 0 
+                END)) OVER(), 
+        1
+    ) AS percentage
+FROM (
+    SELECT 
+        cte.*, 
+        LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+    FROM 
+        cte
+    WHERE 
+        start_date <= '2020-12-31'
+) temp
+GROUP BY 
+    plan_id, 
+    plan_name
+ORDER BY 
+    plan_id;
+````
+- I know this is a bit complex, but you can understand it if you put enough time. You can skip this approach if you’re comfortable with row_number() method.
+
+---
+
+
 **8. How many customers have upgraded to an annual plan in 2020?**
-
+This is a pretty easy question, we just need to filter out our results which have `start_date year in 2020` and `plan_id = 3` and we will apply the `count()` fn to get the count.
 #### Final Query
-
+```` sql
+SELECT 
+    COUNT(*) as customers_upgraded_to_annual_plan_in_2020
+FROM 
+    CTE
+WHERE 
+    plan_id = 3 
+    AND EXTRACT(year FROM start_date) = 2020;
+````
 #### Output Table
  
+| customers_upgraded_to_annual_plan_in_2020 |
+| ----------------------------------------- |
+| 195                                       |
+
+---
+
+
 **9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?**
+### Approach 1 : Using Lead/Lag Functions
+Before we jump to lead/lag, I want you to observe this table first.
+```` sql
+SELECT * FROM CTE WHERE plan_id in (0,3);
+````
+- Each and every customer has to start their journey at foodie fi by taking a free trial first, so we have it for everyone. But for only those customers who have taken annual plans, they have 2 rows, one for `plan_id = 0` trial and one for `plan_id = 3` annual plan.
+- We can find the `next_start_date` or `prev_start_date` using lead or lag functions.
+- So now all we gotta do is find average of `next_start_date – start_date` or `start_date - prev_start_date`.
+- Notice that when next_start_date/prev_start_date is blank/null, by default that calculation will not be counted.
+
 
 #### Final Query
-
+```` sql
+SELECT 
+    AVG(next_date - start_date) AS avg_days_taken_to_go_annual
+FROM (
+    SELECT 
+        cte.*, 
+        LEAD(start_date, 1) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+    FROM 
+        CTE
+    WHERE 
+        plan_id IN (0, 3)
+) temp;
+````
 #### Output Table
  
+| avg_days_taken_to_go_annual |
+| --------------------------- |
+| 104.6201550387596899        |
+
+---
+
 **10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)**
 
 #### Final Query
