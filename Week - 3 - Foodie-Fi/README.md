@@ -502,7 +502,7 @@ ON t1.customer_id = t2.customer_id;
 ### Approach 1 : Using Case Statements
 Again just from the previous table  instead of calculating the average, we need to group them on a 30 day interval.\
 The following query may look big, but overall it is just a bunch of case statements for each and every interval.\
-** Note : This is just the brute force method. If you want to know how to solve this question in a generalized way directly go to approach 2**
+**Note : This is just the brute force method. If you want to know how to solve this question in a generalized way directly go to approach 2**
 
 #### Final Query
 ```` sql
