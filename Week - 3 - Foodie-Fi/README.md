@@ -499,8 +499,10 @@ ON t1.customer_id = t2.customer_id;
 ---
 
 **10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)**
+### Approach 1 : Using Case Statements
 Again just from the previous table  instead of calculating the average, we need to group them on a 30 day interval.\
-The following query may look big, but overall it is just a bunch of case statements for each and every interval.
+The following query may look big, but overall it is just a bunch of case statements for each and every interval.\
+** Note : This is just the brute force method. If you want to know how to solve this question in a generalized way directly go to approach 2**
 
 #### Final Query
 ```` sql
@@ -572,6 +574,36 @@ ORDER BY
 | 301-330 days | 1     |
 | 331-360 days | 1     |
 
+### Approach 2 : Using Mathematics
+- The reason we are learning this approach is because, what if there are more than these 12 intervals, what if we have data for 10 years, how will we implement that? We cannot write these case statements for each and every interval.
+- Again this approach just plays with maths, so I will try my best to explain through words but I can assure you the maths is not to the level of calculus lol. You can easily understand it, it is just bunch of multiplications,additions and divisions.
+````sql
+SELECT 
+    days, 
+    COUNT(*)
+FROM (
+    SELECT 
+        (date_diff - 1) / 30 AS order_value,
+        (((date_diff - 1) / 30) * 30) + 1 || ' - ' || (((date_diff - 1) / 30) + 1) * 30 || ' days' AS days
+    FROM (
+        SELECT 
+            cte.*, 
+            start_date - LAG(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS date_diff
+        FROM 
+            cte
+        WHERE 
+            plan_id IN (0, 3)
+    ) temp
+) temp
+WHERE 
+    days IS NOT NULL
+GROUP BY 
+    days, 
+    order_value
+ORDER BY 
+    order_value;
+````
+- This will produce the exact same output as before, but this is a general query that works for infinite number of intervals, much smaller and preferred method. Please leave a comment if you feel like you didn't understand what I was doing, I will update it with explanation.
 ---
 
 **11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
