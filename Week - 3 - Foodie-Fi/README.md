@@ -608,7 +608,7 @@ ORDER BY
 **Note : There are some in-built functions in sql that deal with bins, however I don't think they work in every sql dialect. You can explore those bins as well and solve this question using them, but I prefer mathematical approach because it works anywhere.**
 ---
 
-**11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
+**11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**\
 Again this problem can be solved in multiple approaches using lead/lag and joins. As you’re already familiar with this type of questions  I will directly jump to the solution using lead(). I hope you can write alternate queries in any approach you would like.
 #### Final Query
 ```` sql
