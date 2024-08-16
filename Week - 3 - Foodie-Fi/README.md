@@ -256,14 +256,86 @@ FROM (
 ---
 
 **6. What is the number and percentage of customer plans after their initial free trial?**
+### Approach 1 : Using Row Nmber
+- We need to find something that happened right after initial free trial. So, my first inituition to approach this question is by using `row_numbers` because we can filter out our required columns by using `rn = 2`.
+Next we need to find the count of each `plan_id` and its percentage. First lets focus on just the count.
+- As we need it for each `plan_id`, we need to `GROUP BY plan_id,plan_name`
+```` sql
+SELECT 
+    plan_id, 
+    plan_name, 
+    COUNT(*) AS count
+FROM (
+    SELECT 
+        cte.*, 
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY start_date) AS rn
+    FROM 
+        CTE
+) temp
+WHERE rn = 2
+GROUP BY 
+    plan_id, 
+    plan_name
+ORDER BY 1;
+````
+- Next to calculate percentage,you can use the normal subquery method where in denominator you will do `SELECT count(distinct customer_id) FROM cte`
+However I want you to know that instead sub query, we can do this :\
+`sum(count(*)) over()` -> this will sum up all the values in the count column\
+So combining all this we get our final query.
 
 #### Final Query
-
+```` sql
+SELECT 
+    plan_id, 
+    plan_name, 
+    COUNT(*) AS count,
+    ROUND(
+        100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 
+        1
+    ) AS perc
+FROM (
+    SELECT 
+        cte.*, 
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY start_date) AS rn
+    FROM 
+        CTE
+) temp
+WHERE 
+    rn = 2
+GROUP BY 
+    plan_id, 
+    plan_name
+ORDER BY 
+    plan_id;
+````
 #### Output Table
  
+| plan_id | plan_name     | count | perc |
+| ------- | ------------- | ----- | ---- |
+| 1       | basic monthly | 546   | 54.6 |
+| 2       | pro monthly   | 325   | 32.5 |
+| 3       | pro annual    | 37    | 3.7  |
+| 4       | churn         | 92    | 9.2  |
+
+- Just like previous questions we can use lead/lag functions to get the answer as well. I don’t think much detail is needed as you are already familiar with alternate approaches, hopefully you can solve this by yourself.
+
+---
+
 **7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?**
+Before going to the solution I want you to try this problem for a couple more minutes, because  this is a bit tricky and I can assure you that when you get the correct solution yourself it feels pretty good.\
+If you didn’t get the answer, no worries, we are here to learn after all.\
+So we want the customer count and percentage breakdown for all 5 plan_names before the year 2021. So can we just put a where condition to eliminate all the plans that are after the end of 2020.\
+But even after applying the condition we will have all the previous plans that the customer had used. But we only want to know the latest plan the customer was using as of before end of 2020.
+- So we can use `row_number()` and `order by start_date DESC` to get the latest plan to be marked by `rn 1`.
 
 #### Final Query
+SELECT 
+    cte.*, 
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY start_date DESC) AS rn
+FROM 
+    CTE
+WHERE 
+    start_date < '2020-12-31';
 
 #### Output Table
  
