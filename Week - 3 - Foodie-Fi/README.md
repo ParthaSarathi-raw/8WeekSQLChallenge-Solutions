@@ -603,7 +603,9 @@ GROUP BY
 ORDER BY 
     order_value;
 ````
-- This will produce the exact same output as before, but this is a general query that works for infinite number of intervals, much smaller and preferred method. Please leave a comment if you feel like you didn't understand what I was doing, I will update it with explanation.
+- This will produce the exact same output as before, but this is a general query that works for infinite number of intervals, much smaller and preferred method. Please leave a comment if you feel like you didn't understand what I was doing, I will update it with explanation.\
+\
+**Note : There are some in-built functions in sql that deal with bins, however I don't think they work in every sql dialect. You can explore those bins as well and solve this question using them, but I prefer mathematical approach because it works anywhere.**
 ---
 
 **11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
