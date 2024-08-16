@@ -652,6 +652,7 @@ SELECT generate_series(
 Generate_Series Output :
 <br>
 ![image](https://github.com/user-attachments/assets/cb8ed405-8d49-4e16-bcbe-e412afeadef5)
+\
 - Next I want you to take a look at this table
 ```` sql
 SELECT 
@@ -688,7 +689,7 @@ FROM (
 ````
 ![image](https://github.com/user-attachments/assets/7b4f1451-14ef-442b-97ff-4a3fbe450a48)
 ---
-**NOTE : Did you see instead of next_date, I took next_date -1. This is because coalesce is inclusive in nature. So when a customer changes their plan exactly after 1 month, it will count it as twice and we don’t want that to happen.**
+**NOTE : Did you see instead of next_date, I took next_date -1. This is because coalesce is inclusive in nature. So when a customer changes their plan exactly after 1 month, it will count it as twice and we don’t want that to happen.**\
 Look at the following cases.\
 Case 1 : Using next_date-1
 ![image](https://github.com/user-attachments/assets/f7593d69-72d6-4b74-900c-362b1a5879f6)
