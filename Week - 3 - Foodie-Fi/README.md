@@ -635,3 +635,331 @@ WHERE
 - I didn’t even include the condition for it to be in 2020 and the count is already coming out to be zero. So by common sense we can say that in 2020 no one downgraded from pro monthly to normal monthly.
 ---
 
+## Challenge Payment Solution
+
+They gave us a sample output of what our table should look like :-
+![image](https://github.com/user-attachments/assets/daae800e-c66a-4e1f-8cd1-29e4c44242c0)
+
+Based on this table I can see that, the monthly subscriptions are being repeated every month. 
+- Before we dive into the solution I want you to understand the generate_series function. Look at the example below.
+```` sql
+SELECT generate_series(
+    '2020-01-01'::date,
+    '2021-01-01'::date,
+    '1 month'::interval
+) AS first_of_month;
+````
+Generate_Series Output :
+![image](https://github.com/user-attachments/assets/cb8ed405-8d49-4e16-bcbe-e412afeadef5)
+- Next I want you to take a look at this table
+```` sql
+SELECT 
+    CTE.*, 
+    LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+FROM 
+    CTE
+WHERE 
+    EXTRACT(year FROM start_date) = 2020 
+    AND plan_id NOT IN (0);
+````
+Table Output :
+![image](https://github.com/user-attachments/assets/c635a424-7de8-4a9b-a95b-9b763a928f68)
+Here we are just only extracting the data that we only require for the questions.\
+We don’t need to display free trails.\
+Next we will create a payment_date column using the generate series function, but if next_date is null, then we want it generate until the end of year 2020.
+```` sql
+SELECT 
+    customer_id, 
+    plan_id, 
+    plan_name, 
+    GENERATE_SERIES(start_date, COALESCE(next_date - 1, '2020-12-31'::date), '1 month'::interval) AS payment_date, 
+    price AS amount
+FROM (
+    SELECT 
+        CTE.*, 
+        LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+    FROM 
+        CTE
+    WHERE 
+        EXTRACT(year FROM start_date) = 2020 
+        AND plan_id != 0
+) t;
+````
+![image](https://github.com/user-attachments/assets/7b4f1451-14ef-442b-97ff-4a3fbe450a48)
+---
+**NOTE : Did you see instead of next_date, I took next_date -1. This is because coalesce is inclusive in nature. So when a customer changes their plan exactly after 1 month, it will count it as twice and we don’t want that to happen.**
+Look at the following cases.\
+Case 1 : Using next_date-1
+![image](https://github.com/user-attachments/assets/f7593d69-72d6-4b74-900c-362b1a5879f6)
+Case 2 : Using next_date 
+![image](https://github.com/user-attachments/assets/f4297592-a702-4c36-85fb-733e2e783e2a)
+- You see  how both pro monthly and pro annual are included in this which makes this incorrect. It is a minor thing but we gotta be careful about these edge cases. How did I generate these output tables,we will find out soon, I just showed these to give you an example of why we need to do next_date – 1.
+Lets get back to the solution.
+---
+- Also did you notice that this is also generating monthly payments for annual payments which doesn’t make sense lol and it will generate it the same for churns.
+- If we exclude plan_id 0,3,4 in the where clause, the series will generate till the end of the month for every monthly plan. We gotta know when to stop the generation of series. This is why we will include plan ids 3 and 4 in the beginning. And finally after calculation we can exclude them by passing this table as subquery.
+```` sql
+SELECT *
+FROM (
+    SELECT 
+        customer_id, 
+        plan_id, 
+        plan_name, 
+        GENERATE_SERIES(start_date, COALESCE(next_date - 1, '2020-12-31'::date), '1 month'::interval) AS payment_date, 
+        price AS amount
+    FROM (
+        SELECT 
+            CTE.*, 
+            LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+        FROM 
+            CTE
+        WHERE 
+            EXTRACT(year FROM start_date) = 2020 
+            AND plan_id != 0
+    ) t
+) temp
+WHERE 
+    plan_id IN (1, 2);
+````
+- Next we have to also include plan_id 3 which only happens once a year. So we can combine it with using UNION ALL.
+- Also there is no need to include plan_id 4 because that is not a payment and it will not be included in the payments table.
+```` sql
+SELECT * 
+FROM (
+    SELECT 
+        customer_id, 
+        plan_id, 
+        plan_name, 
+        GENERATE_SERIES(start_date, COALESCE(next_date - 1, '2020-12-31'::date), '1 month'::interval) AS payment_date, 
+        price AS amount
+    FROM (
+        SELECT 
+            CTE.*, 
+            LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+        FROM 
+            CTE
+        WHERE 
+            EXTRACT(year FROM start_date) = 2020 
+            AND plan_id != 0
+    ) t
+    WHERE 
+        plan_id IN (1, 2)
+
+    UNION ALL
+
+    SELECT 
+        customer_id, 
+        plan_id, 
+        plan_name, 
+        start_date AS payment_date, 
+        price AS amount
+    FROM 
+        CTE
+    WHERE 
+        plan_id = 3
+) temp
+ORDER BY 
+    customer_id, 
+    payment_date;
+````
+![image](https://github.com/user-attachments/assets/7b30a878-60e5-48f0-9ec7-b8a28acc5e85)
+Cool, now this is kind of looking like the final output table that we might need. 
+However there is still one condition we need to implement.
+- Upgrades from basic to monthly or pro plans are reduced by the current paid amount in that month and start immediately
+- First lets create the above output table as CTE and perform operations on there.
+- Here the condition would be if cur_plan_id = 2 or 3 and prev_plan_id = 1 then amount would be `(price – 9.90)` when the cur_plan was bought before the prev_plan 1 expired.
+- Also we have to implement payment_order which can easily be done with the help of row_number(). Pls look at the following final Query.
+#### Final Query
+```` sql
+,CTE2 AS (
+    SELECT * 
+    FROM (
+        SELECT 
+            customer_id,
+            plan_id,
+            plan_name,
+            GENERATE_SERIES(start_date, COALESCE(next_date - 1, '2020-12-31'::date), '1 month'::interval) AS payment_date,
+            price AS amount
+        FROM (
+            SELECT 
+                CTE.*, 
+                LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+            FROM 
+                CTE
+            WHERE 
+                EXTRACT(year FROM start_date) = 2020 
+                AND plan_id != 0
+        ) t
+        WHERE 
+            plan_id IN (1, 2)
+
+        UNION ALL
+
+        SELECT 
+            customer_id,
+            plan_id,
+            plan_name,
+            start_date AS payment_date,
+            price AS amount
+        FROM 
+            CTE
+        WHERE 
+            plan_id = 3
+    ) temp
+    ORDER BY 
+        customer_id, 
+        payment_date
+)
+
+SELECT 
+    temp.*, 
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY payment_date) AS payment_order
+FROM (
+    SELECT 
+        customer_id,
+        plan_id,
+        plan_name,
+        payment_date,
+        CASE 
+            WHEN (
+                LAG(plan_id, 1) OVER (PARTITION BY customer_id ORDER BY payment_date) = 1 
+                AND plan_id IN (2, 3)
+                AND LAG(payment_date, 1) OVER (PARTITION BY customer_id ORDER BY payment_date) + '1 month'::interval > payment_date
+            ) THEN amount - 9.90 
+            ELSE amount 
+        END AS amount
+    FROM 
+        CTE2
+) temp ;
+````
+#### Output Table (Limited to 10 Rows)
+
+
+| customer_id | plan_id | plan_name     | payment_date             | amount | payment_order |
+| ----------- | ------- | ------------- | ------------------------ | ------ | ------------- |
+| 1           | 1       | basic monthly | 2020-08-08T00:00:00.000Z | 9.90   | 1             |
+| 1           | 1       | basic monthly | 2020-09-08T00:00:00.000Z | 9.90   | 2             |
+| 1           | 1       | basic monthly | 2020-10-08T00:00:00.000Z | 9.90   | 3             |
+| 1           | 1       | basic monthly | 2020-11-08T00:00:00.000Z | 9.90   | 4             |
+| 1           | 1       | basic monthly | 2020-12-08T00:00:00.000Z | 9.90   | 5             |
+| 2           | 3       | pro annual    | 2020-09-27T00:00:00.000Z | 199.00 | 1             |
+| 3           | 1       | basic monthly | 2020-01-20T00:00:00.000Z | 9.90   | 1             |
+| 3           | 1       | basic monthly | 2020-02-20T00:00:00.000Z | 9.90   | 2             |
+| 3           | 1       | basic monthly | 2020-03-20T00:00:00.000Z | 9.90   | 3             |
+| 3           | 1       | basic monthly | 2020-04-20T00:00:00.000Z | 9.90   | 4             |
+
+### Checking of Solution
+
+- And If I am not mistaken , this should be the final payments table that we gotta generate.
+- I know this is a lengthy process and some mistakes could have crept in, so lets double check with the sample output that has been provided.
+- I am just going to put the where condition for customer_ids, which are available in sample table.
+```` sql
+,CTE2 AS (
+    SELECT * 
+    FROM (
+        SELECT 
+            customer_id,
+            plan_id,
+            plan_name,
+            GENERATE_SERIES(start_date, COALESCE(next_date - 1, '2020-12-31'::date), '1 month'::interval) AS payment_date,
+            price AS amount
+        FROM (
+            SELECT 
+                CTE.*, 
+                LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_date
+            FROM 
+                CTE
+            WHERE 
+                EXTRACT(year FROM start_date) = 2020 
+                AND plan_id != 0
+        ) t
+        WHERE 
+            plan_id IN (1, 2)
+
+        UNION ALL
+
+        SELECT 
+            customer_id,
+            plan_id,
+            plan_name,
+            start_date AS payment_date,
+            price AS amount
+        FROM 
+            CTE
+        WHERE 
+            plan_id = 3
+    ) temp
+    ORDER BY 
+        customer_id, 
+        payment_date
+)
+
+SELECT 
+    temp.*, 
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY payment_date) AS payment_order
+FROM (
+    SELECT 
+        customer_id,
+        plan_id,
+        plan_name,
+        payment_date,
+        CASE 
+            WHEN (
+                LAG(plan_id, 1) OVER (PARTITION BY customer_id ORDER BY payment_date) = 1 
+                AND plan_id IN (2, 3)
+                AND LAG(payment_date, 1) OVER (PARTITION BY customer_id ORDER BY payment_date) + '1 month'::interval > payment_date
+            ) THEN amount - 9.90 
+            ELSE amount 
+        END AS amount
+    FROM 
+        CTE2
+) temp 
+WHERE 
+    customer_id IN (1, 2, 13, 15, 16, 18, 19);
+````
+#### Output Sample Table generated by us
+
+| customer_id | plan_id | plan_name     | payment_date             | amount | payment_order |
+| ----------- | ------- | ------------- | ------------------------ | ------ | ------------- |
+| 1           | 1       | basic monthly | 2020-08-08T00:00:00.000Z | 9.90   | 1             |
+| 1           | 1       | basic monthly | 2020-09-08T00:00:00.000Z | 9.90   | 2             |
+| 1           | 1       | basic monthly | 2020-10-08T00:00:00.000Z | 9.90   | 3             |
+| 1           | 1       | basic monthly | 2020-11-08T00:00:00.000Z | 9.90   | 4             |
+| 1           | 1       | basic monthly | 2020-12-08T00:00:00.000Z | 9.90   | 5             |
+| 2           | 3       | pro annual    | 2020-09-27T00:00:00.000Z | 199.00 | 1             |
+| 13          | 1       | basic monthly | 2020-12-22T00:00:00.000Z | 9.90   | 1             |
+| 15          | 2       | pro monthly   | 2020-03-24T00:00:00.000Z | 19.90  | 1             |
+| 15          | 2       | pro monthly   | 2020-04-24T00:00:00.000Z | 19.90  | 2             |
+| 16          | 1       | basic monthly | 2020-06-07T00:00:00.000Z | 9.90   | 1             |
+| 16          | 1       | basic monthly | 2020-07-07T00:00:00.000Z | 9.90   | 2             |
+| 16          | 1       | basic monthly | 2020-08-07T00:00:00.000Z | 9.90   | 3             |
+| 16          | 1       | basic monthly | 2020-09-07T00:00:00.000Z | 9.90   | 4             |
+| 16          | 1       | basic monthly | 2020-10-07T00:00:00.000Z | 9.90   | 5             |
+| 16          | 3       | pro annual    | 2020-10-21T00:00:00.000Z | 189.10 | 6             |
+| 18          | 2       | pro monthly   | 2020-07-13T00:00:00.000Z | 19.90  | 1             |
+| 18          | 2       | pro monthly   | 2020-08-13T00:00:00.000Z | 19.90  | 2             |
+| 18          | 2       | pro monthly   | 2020-09-13T00:00:00.000Z | 19.90  | 3             |
+| 18          | 2       | pro monthly   | 2020-10-13T00:00:00.000Z | 19.90  | 4             |
+| 18          | 2       | pro monthly   | 2020-11-13T00:00:00.000Z | 19.90  | 5             |
+| 18          | 2       | pro monthly   | 2020-12-13T00:00:00.000Z | 19.90  | 6             |
+| 19          | 2       | pro monthly   | 2020-06-29T00:00:00.000Z | 19.90  | 1             |
+| 19          | 2       | pro monthly   | 2020-07-29T00:00:00.000Z | 19.90  | 2             |
+| 19          | 3       | pro annual    | 2020-08-29T00:00:00.000Z | 199.00 | 3             |
+
+
+- We can see that this table that we generate is exactly similar to the sample table given by Danny. So fingers crossed I can confidently say that we have generated correct output.
+
+
+---
+
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+### Anyways Happy Fiddling with the Data. See you in the next case study.
+
+
+
+
+
+
+
+
+
