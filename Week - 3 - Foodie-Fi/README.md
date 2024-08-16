@@ -470,17 +470,134 @@ FROM (
 | --------------------------- |
 | 104.6201550387596899        |
 
+### Apporach 2 : Using Joins
+- Table 1 will have all the customers who have taken `plan_id = 0`
+- Table 2 will have all the customers who have taken `plan_id = 3`
+- When we join both tables, the output will be only those customers who have taken annual subscription.
+- Next all we gotta do is find the difference between the dates and average them.
+#### Final Query 2
+```` sql
+SELECT 
+    AVG(next_date - start_date)
+FROM (
+    SELECT * 
+    FROM CTE 
+    WHERE plan_id = 0
+) t1
+JOIN (
+    SELECT 
+        customer_id, 
+        start_date AS next_date 
+    FROM 
+        CTE 
+    WHERE 
+        plan_id = 3
+) t2
+ON t1.customer_id = t2.customer_id;
+````
+
 ---
 
 **10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)**
+Again just from the previous table  instead of calculating the average, we need to group them on a 30 day interval.\
+The following query may look big, but overall it is just a bunch of case statements for each and every interval.
 
 #### Final Query
-
+```` sql
+SELECT *
+FROM (
+    SELECT
+        CASE
+            WHEN date_diff BETWEEN 1 AND 30 THEN '1-30 days'
+            WHEN date_diff BETWEEN 31 AND 60 THEN '31-60 days'
+            WHEN date_diff BETWEEN 61 AND 90 THEN '61-90 days'
+            WHEN date_diff BETWEEN 91 AND 120 THEN '91-120 days'
+            WHEN date_diff BETWEEN 121 AND 150 THEN '121-150 days'
+            WHEN date_diff BETWEEN 151 AND 180 THEN '151-180 days'
+            WHEN date_diff BETWEEN 181 AND 210 THEN '181-210 days'
+            WHEN date_diff BETWEEN 211 AND 240 THEN '211-240 days'
+            WHEN date_diff BETWEEN 241 AND 270 THEN '241-270 days'
+            WHEN date_diff BETWEEN 271 AND 300 THEN '271-300 days'
+            WHEN date_diff BETWEEN 301 AND 330 THEN '301-330 days'
+            WHEN date_diff BETWEEN 331 AND 360 THEN '331-360 days'
+        END AS days,
+        COUNT(*)
+    FROM (
+        SELECT rn - start_date AS date_diff
+        FROM (
+            SELECT
+                plan_id,
+                customer_id,
+                start_date,
+                LEAD(start_date) OVER (PARTITION BY customer_id ORDER BY start_date) AS rn
+            FROM 
+                cte
+            WHERE 
+                plan_id IN (0, 3)
+        ) t
+        WHERE rn - start_date IS NOT NULL
+    ) temp
+    GROUP BY days
+) temp
+ORDER BY 
+    CASE
+        WHEN days = '1-30 days' THEN 1
+        WHEN days = '31-60 days' THEN 2
+        WHEN days = '61-90 days' THEN 3
+        WHEN days = '91-120 days' THEN 4
+        WHEN days = '121-150 days' THEN 5
+        WHEN days = '151-180 days' THEN 6
+        WHEN days = '181-210 days' THEN 7
+        WHEN days = '211-240 days' THEN 8
+        WHEN days = '241-270 days' THEN 9
+        WHEN days = '271-300 days' THEN 10
+        WHEN days = '301-330 days' THEN 11
+        WHEN days = '331-360 days' THEN 12
+    END;
+````
 #### Output Table
  
+| days         | count |
+| ------------ | ----- |
+| 1-30 days    | 49    |
+| 31-60 days   | 24    |
+| 61-90 days   | 34    |
+| 91-120 days  | 35    |
+| 121-150 days | 42    |
+| 151-180 days | 36    |
+| 181-210 days | 26    |
+| 211-240 days | 4     |
+| 241-270 days | 5     |
+| 271-300 days | 1     |
+| 301-330 days | 1     |
+| 331-360 days | 1     |
+
+---
+
 **11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
-
+Again this problem can be solved in multiple approaches using lead/lag and joins. As you’re already familiar with this type of questions  I will directly jump to the solution using lead(). I hope you can write alternate queries in any approach you would like.
 #### Final Query
-
+```` sql
+SELECT 
+    COUNT(DISTINCT customer_id) as downgraded_from_pro_monthly_to_basic_monthly
+FROM (
+    SELECT 
+        cte.*, 
+        LEAD(plan_id, 1) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_plan_id
+    FROM 
+        CTE
+) temp
+WHERE 
+    next_plan_id = 1 
+    AND plan_id = 2;
+````
 #### Output Table
  
+
+| downgraded_from_pro_monthly_to_basic_monthly |
+| -------------------------------------------- |
+| 0                                            |
+
+- I didn’t even include the condition for it to be in 2020 and the count is already coming out to be zero. So by common sense we can say that in 2020 no one downgraded from pro monthly to normal monthly.
+---
+
