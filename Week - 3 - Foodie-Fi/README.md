@@ -9,6 +9,8 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 ## Entity Relationship Diagram
 <img width="493" alt="image" src="https://github.com/user-attachments/assets/0ee18517-5e6a-4516-8b15-84b31215d7ed">
 \
+\
+\
 Based on the given data, there are only 2 tables, so I think would be easier if we create a CTE by joining these both tables and performing our required operations on them.
 
 ## Creation of CTE
