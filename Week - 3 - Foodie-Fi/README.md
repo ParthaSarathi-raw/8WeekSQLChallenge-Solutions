@@ -666,6 +666,7 @@ WHERE
 ````
 Table Output :
 ![image](https://github.com/user-attachments/assets/c635a424-7de8-4a9b-a95b-9b763a928f68)
+<br>
 Here we are just only extracting the data that we only require for the questions.\
 We don’t need to display free trails.\
 Next we will create a payment_date column using the generate series function, but if next_date is null, then we want it generate until the end of year 2020.
