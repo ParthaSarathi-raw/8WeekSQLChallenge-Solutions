@@ -175,11 +175,86 @@ FROM
 ---
 
 **5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?**
+We can solve this by using either lead/lag functions or by using row_number. Let us see both approaches.
+### Approach 1 : Using Row Number
+- I don’t know if you have noticed this, but every customer of foodie_fi needs to start their journey by first taking a free trial. Atleast that is what I understood from the data. So this approach banks on the fact that the initial trial 
+- Lets say for example if a person started their plan by directly taking monthly subscription and churned right after. Our approach will consider this as valid person and counts. But they didn’t take a free trial and churned right after that. So I want you to keep this in mind while we see the row_number() approach. Again this approach only works because we are going with the fact the no matter who it is, everyone starts their foodie_fi experience with a free trial.
+
+Coming to SQL part, first we will assign row number to each and every customer ordered on their start_date.
+
+```` sql
+SELECT cte.*,row_number() OVER (PARTITION BY customer_id ORDER BY start_date) as rn FROM CTE
+````
+- Then from this table we just gotta check if `plan_id = 4` for `rn = 2` because we already know that `rn = 1` will be free trial only.
+- We can put these conditions on where clause and apply `subquery` for denominator while calculating percentage. Or we can use `sum(case)` as well, you please follow whatever you prefer.
 
 #### Final Query
-
+```` sql
+SELECT 
+    ROUND(
+        100.0 * SUM(CASE WHEN rn = 2 AND plan_id = 4 THEN 1 ELSE 0 END) / 
+        COUNT(DISTINCT customer_id), 
+        1
+    ) AS percentage_churned
+FROM (
+    SELECT 
+        cte.*, 
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY start_date) AS rn
+    FROM 
+        CTE
+) temp;
+````
 #### Output Table
  
+| percentage_churned |
+| ------------------ |
+| 9.2                |
+
+### Approach 2 : Using Lead/Lag Functions
+We can use any function that we prefer, I will give you both examples as well.\
+### Using Lead() :
+```` sql
+SELECT  cte.*,lead(plan_id,1) OVER(PARTITION BY customer_id ORDER BY START_DATE) as next_plan FROM CTE;
+````
+This will give the next plan_id for every row.\
+Now we gotta sum only when current `plan_id = 0` and `next_plan_id = 4`\
+Notice how we didn’t have to check if the before plan_id was 0 in the above approach. But in this approach we have to check that condition. Then we will pass this as subquery to get the desired result.
+#### Final Query 2A
+````sql
+SELECT 
+    ROUND(
+        100.0 * SUM(CASE WHEN plan_id = 0 AND next_plan = 4 THEN 1 ELSE 0 END) / 
+        COUNT(DISTINCT customer_id), 
+        1
+    ) AS perc_churned
+FROM (
+    SELECT 
+        cte.*, 
+        LEAD(plan_id, 1) OVER (PARTITION BY customer_id ORDER BY start_date) AS next_plan
+    FROM 
+        CTE
+) temp;
+````
+### Using Lag() :
+- I won’t get into much detail as this is pretty similar to Lead(), but with few minor changes.
+#### Final Query 2B
+```` sql
+SELECT 
+    ROUND(
+        100.0 * SUM(CASE WHEN plan_id = 4 AND prev_plan = 0 THEN 1 ELSE 0 END) / 
+        COUNT(DISTINCT customer_id), 
+        1
+    ) AS perc_churned
+FROM (
+    SELECT 
+        cte.*, 
+        LAG(plan_id, 1) OVER (PARTITION BY customer_id ORDER BY start_date) AS prev_plan
+    FROM 
+        CTE
+) temp;
+````
+---
+
 **6. What is the number and percentage of customer plans after their initial free trial?**
 
 #### Final Query
