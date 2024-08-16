@@ -13,23 +13,81 @@ You can create a base CTE table if you want, I personally don't think it is nece
 
 ## Customer Nodes Exploration Solutions
 **1.	How many unique nodes are there on the Data Bank system?**
-
+- Simple question, I hope this doesn't need explanation.
 #### Final Query
-
+```` sql
+SELECT count(distinct node_id) from data_bank.customer_nodes;
+````
 #### Output Table
  
+| count |
+| ----- |
+| 5     |
+
+---
+
 **2.	What is the number of nodes per region?**
-
+- Very similar to last question, we just perform `join` to get the region name and `GROUP BY region_id,region_name` while doing `count(distinct node_id)` so we get the number of nodes per region.
 #### Final Query
-
+```` sql
+SELECT 
+    c.region_id,
+    region_name,
+    COUNT(DISTINCT node_id)
+FROM 
+    data_bank.customer_nodes c
+INNER JOIN 
+    data_bank.regions r 
+    ON c.region_id = r.region_id
+GROUP BY 
+    c.region_id,
+    region_name;
+````
 #### Output Table
  
+| region_id | region_name | count |
+| --------- | ----------- | ----- |
+| 1         | Australia   | 5     |
+| 2         | America     | 5     |
+| 3         | Africa      | 5     |
+| 4         | Asia        | 5     |
+| 5         | Europe      | 5     |
+
+---
+
 **3.	How many customers are allocated to each region?**
-
+- Exactly similar to the previous question, but instead of counting nodes, we are counting the customers
 #### Final Query
-
+```` sql
+SELECT 
+    c.region_id,
+    region_name,
+    COUNT(DISTINCT customer_id)
+FROM 
+    data_bank.customer_nodes c
+INNER JOIN 
+    data_bank.regions r 
+    ON c.region_id = r.region_id
+GROUP BY 
+    1, 
+    2
+ORDER BY 
+    1;
+````
 #### Output Table
  
+| region_id | region_name | count |
+| --------- | ----------- | ----- |
+| 1         | Australia   | 110   |
+| 2         | America     | 105   |
+| 3         | Africa      | 102   |
+| 4         | Asia        | 95    |
+| 5         | Europe      | 88    |
+
+---
+
+
+
 **4.	How many days on average are customers reallocated to a different node?**
 
 #### Final Query
