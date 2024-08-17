@@ -106,11 +106,45 @@ Look at the following sample table for a single customer for understanding.
 | 1       | 2020-01-27T00:00:00.000Z | 2020-01-31T00:00:00.000Z | 4         |
 | 1       | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         |
 
-Now I will give you 3 questions. The solutions will be just down below but hidden as spoilers. First try to answer these questions for yourself.
+Now I will give you 3 questions. The solutions will be just down below but hidden as spoilers. First try to answer these questions for yourself.\
+
+
+<br>
 
 **Q1. How many days on average does it take for the customer to get reallocated?**
-Mathematical Solution : ||(1+6+6+8+4+9)/6 = 5.66||
-Query : ||SELECT avg(date_diff) FROM nodes;||
+<br>
+<details>
+  <summary>Mathematical Solution (Click me to see answer)</summary>
+    (1+6+6+8+4+9)/6 = 5.66
+</details>
+<details>
+  <summary>Query (Click me to see answer)</summary>
+    SELECT avg(date_diff) FROM nodes;
+</details>
+
+**Q2. What is the average time spent on a single node overall by the user?**
+<br>
+<details>
+  <summary>Mathematical Solution (Click me to see answer)</summary>
+    (1+6+8+4+9)+6/2 = 17
+</details>
+<details>
+  <summary>Query (Click me to see answer)</summary>
+    SELECT avg(date_diff) FROM (SELECT sum(date_diff) as date_diff FROM nodes GROUP BY node_id) temp;
+</details>
+
+**Q3. How many days on average did it take for the customer to get reallocated to a different node?**
+Before seeing the answer I want you to see the difference between Q1 and Q3. Did you see **reallocated to a different node?** \
+Will the answer be same as Q1? Lets find out.
+<details>
+  <summary>Mathematical Solution (Click me to see answer)</summary>
+    (1+6)+(6)+(8+4+9)/3 = 11.33
+</details>
+<details>
+  <summary>Query (Click me to see answer)</summary>
+    Even though this might seem like a simple question, the query to solve this is a bit complex, we will build the solution to this question from ground up.
+</details>
+
 #### Final Query
 
 #### Output Table
