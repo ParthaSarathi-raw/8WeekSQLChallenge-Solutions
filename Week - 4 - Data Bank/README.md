@@ -140,16 +140,16 @@ Will the answer be same as Q1? Lets find out.
 <br>
 <details>
   <summary>Mathematical Solution (Click me to see answer)</summary>
-    (1+6)+(6)+(8+4+9)/3 = 11.33
+    (1+6)+(6)+(8+4+9)/3 = 11.33 -> In this case first 2 rows should be treated as one because he is still on same node. Similarly last 3 rows should be treated as one beacause they all are same node.
 </details>
 <details>
   <summary>Query (Click me to see answer)</summary>
     Even though this might seem like a simple question, the query to solve this is a bit complex, we will build the solution to this question from ground up.
 </details>
-<br>
-- I don't know what's up with everyone, but every online resource I looked up answered with solution 1 or solution 2 for question 3 which is just wrong in my opinion.
-- I am too poor to buy danny's official course, but from what I heard from others who had the official course, even the official solution provied by danny is also wrong.
-- Maybe I am stupid and I don't understand proper english, but when it is clearly mentioned **reallocated to a different node** I genuinly don't think either solution 1 or solution 2 is right for that question.
+
+- I don't know what's up with everyone, but every online resource I looked up answered with solution 1 or solution 2 for question 3 which is just wrong in my opinion. 
+- I am too poor to buy danny's official course, but from what I heard from others who had the official course, even the official solution provied by danny is also wrong. 
+- Maybe I am stupid and I don't understand proper english, but when it is clearly mentioned **reallocated to a different node** I genuinly don't think either solution 1 or solution 2 is right for that question. 
 
 #### Final Query
 
