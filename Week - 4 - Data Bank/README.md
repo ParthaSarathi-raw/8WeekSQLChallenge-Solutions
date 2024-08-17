@@ -97,6 +97,16 @@ WHERE end_date != '9999-12-31';
 Before we dive into the correct solution I want to show you general wrong solutions for this problem which I've seen across internet.\
 Look at the following sample table for a single customer for understanding.
 
+```` sql
+ CREATE TABLE nodes (node_id integer,start_date date,end_date date,date_diff integer);
+
+INSERT INTO nodes (node_id,start_date,end_date,date_diff) VALUES
+
+(1,'2020-01-02', '2020-01-03',1),(1,'2020-01-04','2020-01-10',6),(2,'2020-01-11','2020-01-17',6),(1,'2020-01-18','2020-01-26',8),(1,'2020-01-27','2020-01-31',4),(1,'2020-02-01','2020-02-10',9); 
+
+SELECT * FROM nodes;
+````
+
 | node_id | start_date               | end_date                 | date_diff |
 | ------- | ------------------------ | ------------------------ | --------- |
 | 1       | 2020-01-02T00:00:00.000Z | 2020-01-03T00:00:00.000Z | 1         |
@@ -150,6 +160,15 @@ Will the answer be same as Q1? Lets find out.
 - I don't know what's up with everyone, but every online resource I looked up answered with solution 1 or solution 2 for question 3 which is just wrong in my opinion. 
 - I am too poor to buy danny's official course, but from what I heard from others who had the official course, even the official solution provied by danny is also wrong. 
 - Maybe I am stupid and I don't understand proper english, but when it is clearly mentioned **reallocated to a different node** I genuinly don't think either solution 1 or solution 2 is right for that question. 
+
+### Building up the solution for Sample example table
+
+- Look, when ever we have to deal with these type of problems where there would be multiple consecutive rows which needs to be treated as one, in general it is better to categorize them by different categories.
+- First I will write a case statement to determine which type each row belongs to , namely Start, Middle, End and StandAlone which are pretty self explanatory.
+- Start : When ever there is a chain of consecutive rows with same node, the first row would be labelled as start.
+- End : When ever there is a chain of consecutive rows with same node, the last row would be labelled as end.
+- Middle : When ever there is a chain of consecutive rows with same node, all the rows which are not either start or end will be labelled as middle.
+- StandAlone : When a particular row's node doesn't match with either the previous or next node, then it will be labelled as standalone.
 
 #### Final Query
 
