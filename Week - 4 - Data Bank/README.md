@@ -307,7 +307,7 @@ SELECT node_id,start_date,end_date,date_diff FROM CTE WHERE type = 'STANDALONE')
 | 11.3333333333333333 |
 
 - And Voila, that checks out with out mathematical answer (1+6)+(6)+(8+4+9)/3 = 11.33.
-- Cool, the reason I did this to small data set is to explain the logic, now all we gotta do is apply this logic to the original table. Don't worry I won't directly go to solution, we will build it up step by step.
+- Cool, the reason I did this to small data set is to explain the logic, now all we gotta do is apply this logic to the original table.
 
 ## Approach 2 : Short-Cut Process to get the answer (Without calculation of combined table, so ShortCut)
 
