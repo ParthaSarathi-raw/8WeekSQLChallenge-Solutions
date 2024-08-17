@@ -89,6 +89,7 @@ ORDER BY
 
 
 **4.	How many days on average are customers reallocated to a different node?**
+
 Before tackling this question I want you to think of one thing. For every row we have start_date and end_date. But what will be the end_date when the customer is currently in still in the node. He/she will have end_date = '9999-12-31' because they are still alloted to that node and no one knows when they will be realloted again. Hence we need to exclude these rows for our calculation. So whatever we do will be done on the table without these values.
 ```` sql
 SELECT * FROM data_bank.customer_nodes 
