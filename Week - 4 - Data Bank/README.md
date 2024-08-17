@@ -181,7 +181,7 @@ Will the answer be same as Q1? Lets find out.
 
 
  
-Here we can see all the rows which are adjacent and having the same node_id in the original table got combined to form a single row with start_date being min(start_dates),end_date being max(start_dates) and date_diff being sum(date_diffs) for all the adjacent rows.
+Here we can see all the rows which are adjacent and having the same node_id in the sample table I've given got combined to form a single row with start_date being min(start_dates),end_date being max(start_dates) and date_diff being sum(date_diffs) for all the adjacent rows.
 **Note : I'd say just know the process of creating this combined table because, the logic that we use to combine is applicable anywhere.**
 ### Building up the solution for Sample example table
 
