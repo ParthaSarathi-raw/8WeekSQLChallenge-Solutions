@@ -163,7 +163,9 @@ Will the answer be same as Q1? Lets find out.
 
 
 ## Approach 1 : Creating the combined table and then finding the answer (Lenghty process to create combined table)
+
 - By combined table what I mean is this:-
+<br>
 | node_id | start_date               | end_date                 | date_diff |
 | ------- | ------------------------ | ------------------------ | --------- |
 | 1       | 2020-01-02T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 7         |
