@@ -159,18 +159,26 @@ Will the answer be same as Q1? Lets find out.
 
 - I don't know what's up with everyone, but every online resource I looked up answered with solution 1 or solution 2 for question 3 which is just wrong in my opinion. 
 - I am too poor to buy danny's official course, but from what I heard from others who had the official course, even the official solution provied by danny is also wrong. 
-- Maybe I am stupid and I don't understand proper english, but when it is clearly mentioned **reallocated to a different node** I genuinly don't think either solution 1 or solution 2 is right for that question. 
+- Maybe I am stupid and I don't understand proper english, but when it is clearly mentioned **reallocated to a different node** I genuinly don't think either solution 1 or solution 2 is right for that question.
+
+---
+
+### Note : In the above answers that I've given, there is a small flaw. Notice that date_diff is not same as no. of days stayed on that node. For no. of days stayed on that node, the correct answer would be date_diff + 1. But for keeping it simplcity, I'm ignoring the  " + 1 " in the calculation for now, but this can easily be fixed at the end by adding + 1 to date_diff. I just wanted you to know if you're wondering why am I complaining about wrong solutions available on the internet and I myself am giving wrong solutions lol.  
+
+---
 
 
 ## Approach 1 : Creating the combined table and then finding the answer (Lenghty process to create combined table)
 
 - By combined table what I mean is this:-
-<br>
+
 | node_id | start_date               | end_date                 | date_diff |
 | ------- | ------------------------ | ------------------------ | --------- |
 | 1       | 2020-01-02T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 7         |
 | 2       | 2020-01-11T00:00:00.000Z | 2020-01-17T00:00:00.000Z | 6         |
 | 1       | 2020-01-18T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 21        |
+
+
  
 Here we can see all the rows which are adjacent and having the same node_id in the original table got combined to form a single row with start_date being min(start_dates),end_date being max(start_dates) and date_diff being sum(date_diffs) for all the adjacent rows.
 **Note : I'd say just know the process of creating this combined table because, the logic that we use to combine is applicable anywhere.**
@@ -347,15 +355,127 @@ SELECT 1.0*sum(date_diff)/(sum(change_flag)+1) as avg_days_stayed_on_single_node
 
 - See much easier right? Lets now see both approaches for Original Data shall we?
 
-##Approach 1 - Combined Table for Original Data
 
 
 ### Building up Solution For Original Data 
+- I hope I made it crystal clear on the logic. I won't be explaining again because it is just the same thing. Please comment if you are confused about the following query.
+- Look the query will be confusing because you are directly viewing it. But if you try to build it yourself just like I did for the sample table step by step, it makes sense.
+- I strongly recommend you to build the solution yourself so you get a strong understanding of the concept.
 
-#### Final Query
+#### Combined Table for the original data query
+```` sql
+WITH CTE AS (
+    SELECT 
+        CASE 
+            WHEN LAG(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) = node_id 
+                 AND LEAD(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) = node_id THEN 'MIDDLE' 
+            WHEN LEAD(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) = node_id THEN 'START' 
+            WHEN LAG(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) = node_id THEN 'END' 
+            ELSE 'IGNORE' 
+        END AS type, n.* 
+    FROM data_bank.customer_nodes n 
+    WHERE end_date != '9999-12-31' 
+    ORDER BY customer_id, start_date
+),
+CTE2 AS (
+    SELECT cte.*, 
+           CASE WHEN type = 'START' THEN LEAD(end_date) OVER (ORDER BY customer_id, start_date) END AS final_end_date 
+    FROM CTE 
+    WHERE type IN ('START', 'END') 
+    ORDER BY customer_id, start_date
+),
+COMBINED_TABLE AS (
+SELECT * FROM (
+    SELECT cte.customer_id, cte.region_id, cte.node_id, MIN(cte.start_date) AS start_date, final_end_date AS end_date 
+    FROM CTE 
+    JOIN CTE2 ON CTE.start_date BETWEEN CTE2.start_date AND CTE2.final_end_date AND cte.customer_id = cte2.customer_id 
+    GROUP BY cte.customer_id, cte.region_id, cte.node_id, final_end_date
+    UNION ALL
+    SELECT customer_id, region_id, node_id, start_date, end_date 
+    FROM CTE 
+    WHERE type = 'IGNORE'
+) temp ORDER BY customer_id,start_date)
+SELECT * FROM COMBINED_TABLE;
 
-#### Output Table
+````
+#### Output Combined Table
+
+- I'm just including data for 5 customers, in the final output there would be data of 500 customers.
+
+| customer_id | region_id | node_id | start_date               | end_date                 |
+| ----------- | --------- | ------- | ------------------------ | ------------------------ |
+| 1           | 3         | 4       | 2020-01-02T00:00:00.000Z | 2020-01-14T00:00:00.000Z |
+| 1           | 3         | 2       | 2020-01-15T00:00:00.000Z | 2020-01-16T00:00:00.000Z |
+| 1           | 3         | 5       | 2020-01-17T00:00:00.000Z | 2020-01-28T00:00:00.000Z |
+| 1           | 3         | 3       | 2020-01-29T00:00:00.000Z | 2020-02-18T00:00:00.000Z |
+| 1           | 3         | 2       | 2020-02-19T00:00:00.000Z | 2020-03-16T00:00:00.000Z |
+| 2           | 3         | 5       | 2020-01-03T00:00:00.000Z | 2020-01-17T00:00:00.000Z |
+| 2           | 3         | 3       | 2020-01-18T00:00:00.000Z | 2020-02-21T00:00:00.000Z |
+| 2           | 3         | 5       | 2020-02-22T00:00:00.000Z | 2020-03-07T00:00:00.000Z |
+| 2           | 3         | 2       | 2020-03-08T00:00:00.000Z | 2020-03-12T00:00:00.000Z |
+| 2           | 3         | 4       | 2020-03-13T00:00:00.000Z | 2020-03-13T00:00:00.000Z |
+| 3           | 5         | 4       | 2020-01-27T00:00:00.000Z | 2020-02-18T00:00:00.000Z |
+| 3           | 5         | 5       | 2020-02-19T00:00:00.000Z | 2020-03-06T00:00:00.000Z |
+| 3           | 5         | 3       | 2020-03-07T00:00:00.000Z | 2020-03-24T00:00:00.000Z |
+| 3           | 5         | 4       | 2020-03-25T00:00:00.000Z | 2020-04-08T00:00:00.000Z |
+| 3           | 5         | 1       | 2020-04-09T00:00:00.000Z | 2020-04-09T00:00:00.000Z |
+| 3           | 5         | 4       | 2020-04-10T00:00:00.000Z | 2020-04-24T00:00:00.000Z |
+| 4           | 5         | 4       | 2020-01-07T00:00:00.000Z | 2020-02-13T00:00:00.000Z |
+| 4           | 5         | 3       | 2020-02-14T00:00:00.000Z | 2020-03-02T00:00:00.000Z |
+| 4           | 5         | 5       | 2020-03-03T00:00:00.000Z | 2020-03-12T00:00:00.000Z |
+| 4           | 5         | 3       | 2020-03-13T00:00:00.000Z | 2020-04-01T00:00:00.000Z |
+| 5           | 3         | 3       | 2020-01-15T00:00:00.000Z | 2020-01-23T00:00:00.000Z |
+| 5           | 3         | 1       | 2020-01-24T00:00:00.000Z | 2020-02-05T00:00:00.000Z |
+| 5           | 3         | 4       | 2020-02-06T00:00:00.000Z | 2020-02-15T00:00:00.000Z |
+| 5           | 3         | 2       | 2020-02-16T00:00:00.000Z | 2020-02-29T00:00:00.000Z |
+| 5           | 3         | 5       | 2020-03-01T00:00:00.000Z | 2020-03-05T00:00:00.000Z |
+
+
+#### Final Query Using Approach 1 
+- Now that we got the combined query all we gotta do is instead of " * " to retrieved the whole table, we do `avg(end_date-start_date+1)`
+
+```` sql
+SELECT avg(end_date - start_date + 1) FROM COMBINED_TABLE;
+````
+- Notice how I added `+ 1`. A minor change but can easily be looked over when solving fastly.
+
+#### Output Table using Approach 1
  
+| avg                 |
+| ------------------- |
+| 18.8285828984343637 |
+
+#### Final Query Using Approach 2
+```` sql
+WITH CTE AS (
+    SELECT n.*, 
+           CASE WHEN node_id != LAG(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) THEN 1 ELSE 0 END AS flag 
+    FROM data_bank.customer_nodes n 
+    WHERE end_date != '9999-12-31' 
+    ORDER BY customer_id, start_date
+)
+SELECT 1.0 * SUM(end_date - start_date + 1) / (SUM(flag) + (SELECT COUNT(DISTINCT customer_id) FROM CTE)) 
+FROM CTE;
+````
+- Have you noticed what I did in the denominator? This is because if you remember we did +1 in the denominator for that single particular customer. Now there are 500 customers, so we need to do +500 , but I wrote the general query for N number of customers. Remember to write the general query rather than hard coding values into the queries.
+#### Output Table using Approach 2
+| avg                 |
+| ------------------- |
+| 18.8285828984343637 |
+
+- Exactly everything, including the 17th decimal is also the same in both the approaches.
+
+#### Another Final Note
+- What we did here is found the average of days across the whole dataset in a single aggregation.
+- One could argue that instead of finding overall average, it would be better to find the average of days for each customer first and then find the average across all the customers.
+- Again this is not that complicated, you just need to add an intermediate step in both apporaches where you would first find average for each customer by doing `GROUP BY customer_id`. Then on that resultant table you find the avg again.
+- So what actually was asked in the question. avg(date_diff) or avg(date_diff's avg of each customer).
+- Like I said for this question both these answers are fine because the almost give the same result. Why do they give the same result? Check in the next section.
+#### When does the problem arise between avg(across) and avg(avg(each customer))
+- These 2 values in the above problem give the same result because all the customers are **treated equally (same weightage)** by data_bank system while alloting nodes.
+- Lets say there are customers who are the creators of the data_bank itself like danny and team. Because they are special, they don't get reallocated much often. So the no. of days these special customers stay in the nodes is significantly different from other regular users.
+- In this case, the deviation between avg(across) and avg(avg(each customer)) increases. In the broad scope as there will be a lot of regular customers which are much higher than these special customers, it won't matter that much, but the difference between these two values increases when compared to the previous case where there are no special users.
+- If you are really interested in this topic, I suggest you to go through **Simpson's Paradox (Weighted Average Dilemma)**, where you can gain even deeper understand of this problem and decide which type of avg depending on the specific need.
 **5.	What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
 
 #### Final Query
