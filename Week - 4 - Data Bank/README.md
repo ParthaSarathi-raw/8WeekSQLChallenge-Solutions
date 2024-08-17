@@ -116,7 +116,7 @@ SELECT * FROM nodes;
 | 1       | 2020-01-27T00:00:00.000Z | 2020-01-31T00:00:00.000Z | 4         |
 | 1       | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         |
 
-Now I will give you 3 questions. The solutions will be just down below but hidden as spoilers. First try to answer these questions for yourself.\
+Now I will give you 3 questions. The solutions will be just down below but hidden as spoilers. First try to answer these questions for yourself.
 
 
 <br>
@@ -169,6 +169,125 @@ Will the answer be same as Q1? Lets find out.
 - End : When ever there is a chain of consecutive rows with same node, the last row would be labelled as end.
 - Middle : When ever there is a chain of consecutive rows with same node, all the rows which are not either start or end will be labelled as middle.
 - StandAlone : When a particular row's node doesn't match with either the previous or next node, then it will be labelled as standalone.
+
+```` sql
+WITH CTE as (SELECT 
+    node_id,
+    CASE 
+        WHEN LAG(node_id) OVER (ORDER BY start_date) = node_id 
+             AND LEAD(node_id) OVER (ORDER BY start_date) = node_id THEN 'MIDDLE'
+        WHEN LEAD(node_id) OVER (ORDER BY start_date) = node_id THEN 'START'
+        WHEN LAG(node_id) OVER (ORDER BY start_date) = node_id THEN 'END'
+        ELSE 'STANDALONE' 
+    END AS type,
+    start_date,
+    end_date,
+    date_diff
+FROM 
+    nodes)
+SELECT * FROM CTE;
+````
+| node_id | type       | start_date               | end_date                 | date_diff |
+| ------- | ---------- | ------------------------ | ------------------------ | --------- |
+| 1       | START      | 2020-01-02T00:00:00.000Z | 2020-01-03T00:00:00.000Z | 1         |
+| 1       | END        | 2020-01-04T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 6         |
+| 2       | STANDALONE | 2020-01-11T00:00:00.000Z | 2020-01-17T00:00:00.000Z | 6         |
+| 1       | START      | 2020-01-18T00:00:00.000Z | 2020-01-26T00:00:00.000Z | 8         |
+| 1       | MIDDLE     | 2020-01-27T00:00:00.000Z | 2020-01-31T00:00:00.000Z | 4         |
+| 1       | END        | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         |
+
+- We need to combine the types `(START,END)` as one and `(START,MIDDLE,END)` as one.
+- I want you to notice one property that the dates (start_date and end_date) for type `MIDDLE` always fall between `start_date of START` and `end_date of END`. Hence my plan is to perform `GROUP BY` to add all the rows which fall under these days. Lets see how.
+```` sql
+,CTE2 as (
+SELECT 
+    cte.*, 
+    CASE 
+        WHEN type = 'START' THEN LEAD(end_date) OVER (ORDER BY start_date) 
+    END AS final_end_date
+FROM 
+    CTE 
+WHERE 
+    type IN ('START', 'END'))
+    SELECT * FROM CTE2;
+````
+
+| node_id | type  | start_date               | end_date                 | date_diff | final_end_date           |
+| ------- | ----- | ------------------------ | ------------------------ | --------- | ------------------------ |
+| 1       | START | 2020-01-02T00:00:00.000Z | 2020-01-03T00:00:00.000Z | 1         | 2020-01-10T00:00:00.000Z |
+| 1       | END   | 2020-01-04T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 6         |                          |
+| 1       | START | 2020-01-18T00:00:00.000Z | 2020-01-26T00:00:00.000Z | 8         | 2020-02-10T00:00:00.000Z |
+| 1       | END   | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         |                          |
+
+- I am only taking types START and END because the type MIDDLE will be in between these two types.
+- Now for type START, there has to be another type END i.e they always come in pairs and when we order by start_date , every START will be followed by END.
+- So when we take the start_date of START and end_date of END, it will give us with the range of dates that need to be grouped together and need to be treated as one.
+- Next all we gotta do is combine our original cte table with this to get the types START,MIDDLE,END all together in a single table.
+
+```` sql
+SELECT CTE.*,final_end_date FROM CTE JOIN CTE2 
+ON CTE.start_date BETWEEN CTE2.start_date and CTE2.final_end_date;
+````
+| node_id | type   | start_date               | end_date                 | date_diff | final_end_date           |
+| ------- | ------ | ------------------------ | ------------------------ | --------- | ------------------------ |
+| 1       | START  | 2020-01-02T00:00:00.000Z | 2020-01-03T00:00:00.000Z | 1         | 2020-01-10T00:00:00.000Z |
+| 1       | END    | 2020-01-04T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 6         | 2020-01-10T00:00:00.000Z |
+| 1       | START  | 2020-01-18T00:00:00.000Z | 2020-01-26T00:00:00.000Z | 8         | 2020-02-10T00:00:00.000Z |
+| 1       | MIDDLE | 2020-01-27T00:00:00.000Z | 2020-01-31T00:00:00.000Z | 4         | 2020-02-10T00:00:00.000Z |
+| 1       | END    | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         | 2020-02-10T00:00:00.000Z |
+
+- Now we are getting somewhere. Do you notice that now we can simply GROUP BY final_end_date to combine all the date_diff so that they would be treated as one. Lets do this.
+```` sql
+SELECT cte.node_id,min(cte.start_date) as start_date,max(cte.end_date) as end_date,sum(cte.date_diff) as date_diff
+FROM CTE JOIN CTE2 
+ON CTE.start_date BETWEEN CTE2.start_date and CTE2.final_end_date
+GROUP BY cte.node_id,final_end_date;
+````
+| node_id | start_date               | end_date                 | date_diff |
+| ------- | ------------------------ | ------------------------ | --------- |
+| 1       | 2020-01-02T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 7         |
+| 1       | 2020-01-18T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 21        |
+
+- Ayy lets go, now all we gotta do is combine this table with all other rows that are just standalone type and find average across everything to get the desired answer.
+```` sql
+SELECT * FROM (
+SELECT cte.node_id,min(cte.start_date) as start_date,max(cte.end_date) as end_date,sum(cte.date_diff) as date_diff
+FROM CTE JOIN CTE2 
+ON CTE.start_date BETWEEN CTE2.start_date and CTE2.final_end_date
+GROUP BY cte.node_id,final_end_date
+
+UNION ALL
+
+SELECT node_id,start_date,end_date,date_diff FROM CTE WHERE type = 'STANDALONE')temp
+ORDER BY start_date;
+````
+| node_id | start_date               | end_date                 | date_diff |
+| ------- | ------------------------ | ------------------------ | --------- |
+| 1       | 2020-01-02T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 7         |
+| 2       | 2020-01-11T00:00:00.000Z | 2020-01-17T00:00:00.000Z | 6         |
+| 1       | 2020-01-18T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 21        |
+
+- This is what our table looks like after combining all the required rows.
+- Now finally instead of SELECT * FROM (.......), we have to do SELECT avg(date_diff) FROM (.....)
+```` sql
+SELECT avg(date_diff) FROM (
+SELECT cte.node_id,min(cte.start_date) as start_date,max(cte.end_date) as end_date,sum(cte.date_diff) as date_diff
+FROM CTE JOIN CTE2 
+ON CTE.start_date BETWEEN CTE2.start_date and CTE2.final_end_date
+GROUP BY cte.node_id,final_end_date
+
+UNION ALL
+
+SELECT node_id,start_date,end_date,date_diff FROM CTE WHERE type = 'STANDALONE')temp;
+````
+| avg                 |
+| ------------------- |
+| 11.3333333333333333 |
+
+- And Voila, that checks out with out mathematical answer (1+6)+(6)+(8+4+9)/3 = 11.33.
+- Cool, the reason I did this to small data set is to explain the logic, now all we gotta do is apply this logic to the original table. Don't worry I won't directly go to solution, we will build it up step by step.
+
+### Building up Solution For Original Data 
 
 #### Final Query
 
