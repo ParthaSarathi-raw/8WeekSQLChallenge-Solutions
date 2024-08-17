@@ -111,7 +111,7 @@ Now I will give you 3 questions. The solutions will be just down below but hidde
 
 <br>
 
-**Q1. How many days on average does it take for the customer to get reallocated?**
+- **Q1. How many days on average does it take for the customer to get reallocated?**
 <br>
 <details>
   <summary>Mathematical Solution (Click me to see answer)</summary>
@@ -122,7 +122,7 @@ Now I will give you 3 questions. The solutions will be just down below but hidde
     SELECT avg(date_diff) FROM nodes;
 </details>
 
-**Q2. What is the average time spent on a single node overall by the user?**
+- **Q2. What is the average time spent on a single node overall by the user?**
 <br>
 <details>
   <summary>Mathematical Solution (Click me to see answer)</summary>
@@ -133,7 +133,8 @@ Now I will give you 3 questions. The solutions will be just down below but hidde
     SELECT avg(date_diff) FROM (SELECT sum(date_diff) as date_diff FROM nodes GROUP BY node_id) temp;
 </details>
 
-**Q3. How many days on average did it take for the customer to get reallocated to a different node?**
+- **Q3. How many days on average did it take for the customer to get reallocated to a different node?**
+<br>
 Before seeing the answer I want you to see the difference between Q1 and Q3. Did you see **reallocated to a different node?** \
 Will the answer be same as Q1? Lets find out.
 <details>
