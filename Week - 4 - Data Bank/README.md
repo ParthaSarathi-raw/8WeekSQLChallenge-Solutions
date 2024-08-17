@@ -161,6 +161,17 @@ Will the answer be same as Q1? Lets find out.
 - I am too poor to buy danny's official course, but from what I heard from others who had the official course, even the official solution provied by danny is also wrong. 
 - Maybe I am stupid and I don't understand proper english, but when it is clearly mentioned **reallocated to a different node** I genuinly don't think either solution 1 or solution 2 is right for that question. 
 
+
+## Approach 1 : Creating the combined table and then finding the answer (Lenghty process to create combined table)
+- By combined table what I mean is this:-
+| node_id | start_date               | end_date                 | date_diff |
+| ------- | ------------------------ | ------------------------ | --------- |
+| 1       | 2020-01-02T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 7         |
+| 2       | 2020-01-11T00:00:00.000Z | 2020-01-17T00:00:00.000Z | 6         |
+| 1       | 2020-01-18T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 21        |
+ 
+Here we can see all the rows which are adjacent and having the same node_id in the original table got combined to form a single row with start_date being min(start_dates),end_date being max(start_dates) and date_diff being sum(date_diffs) for all the adjacent rows.
+**Note : I'd say just know the process of creating this combined table because, the logic that we use to combine is applicable anywhere.**
 ### Building up the solution for Sample example table
 
 - Look, when ever we have to deal with these type of problems where there would be multiple consecutive rows which needs to be treated as one, in general it is better to categorize them by different categories.
@@ -286,6 +297,56 @@ SELECT node_id,start_date,end_date,date_diff FROM CTE WHERE type = 'STANDALONE')
 
 - And Voila, that checks out with out mathematical answer (1+6)+(6)+(8+4+9)/3 = 11.33.
 - Cool, the reason I did this to small data set is to explain the logic, now all we gotta do is apply this logic to the original table. Don't worry I won't directly go to solution, we will build it up step by step.
+
+## Approach 2 : Short-Cut Process to get the answer (Without calculation of combined table, so ShortCut)
+
+I don't know if you have noticed this, but this question can be solved much simpler way without needing to create the combined table.
+
+The mathematical answer would be = ((1+6)+6+(8+4+9))/3 
+<br>
+Can we say the answer is just = (sum of date_diff)/(no. of times nodes changed + 1)
+<br>
+Think about this for a moment. Makes sense right?
+<br>
+Now which approach do you prefer, the approach 1 or approach 2 lol. If you've skipped approach 1, I strongly suggest you to go and just have a look on how I solved the problem in approach 1, because it could be helpful in other problems as well.
+<br>
+Anyway coming to the shortcut method, we just need to know where the nodes are changing. So I will create a column called flag which has values 1 or 0.\
+1 indicates that w.r.t previous node, the current node is changed. 0 Means the previous node and current node is same.
+
+```` sql
+WITH node_changes AS (
+    SELECT 
+        nodes.*,
+        CASE 
+            WHEN node_id != LAG(node_id) OVER (ORDER BY start_date) THEN 1 
+            ELSE 0 
+        END AS change_flag
+    FROM 
+        nodes
+)
+SELECT * FROM node_changes;
+````
+| node_id | start_date               | end_date                 | date_diff | change_flag |
+| ------- | ------------------------ | ------------------------ | --------- | ----------- |
+| 1       | 2020-01-02T00:00:00.000Z | 2020-01-03T00:00:00.000Z | 1         | 0           |
+| 1       | 2020-01-04T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 6         | 0           |
+| 2       | 2020-01-11T00:00:00.000Z | 2020-01-17T00:00:00.000Z | 6         | 1           |
+| 1       | 2020-01-18T00:00:00.000Z | 2020-01-26T00:00:00.000Z | 8         | 1           |
+| 1       | 2020-01-27T00:00:00.000Z | 2020-01-31T00:00:00.000Z | 4         | 0           |
+| 1       | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         | 0           |
+
+- Now just simply apply the mathematical formula and we get the answer.
+```` sql
+SELECT 1.0*sum(date_diff)/(sum(change_flag)+1) as avg_days_stayed_on_single_node_before_switching FROM node_changes;
+````
+| avg_days_stayed_on_single_node_before_switching |
+| ----------------------------------------------- |
+| 11.3333333333333333                             |
+
+- See much easier right? Lets now see both approaches for Original Data shall we?
+
+##Approach 1 - Combined Table for Original Data
+
 
 ### Building up Solution For Original Data 
 
