@@ -94,6 +94,23 @@ Before tackling this question I want you to think of one thing. For every row we
 SELECT * FROM data_bank.customer_nodes 
 WHERE end_date != '9999-12-31';
 ````
+Before we dive into the correct solution I want to show you general wrong solutions for this problem which I've seen across internet.\
+Look at the following sample table for a single customer for understanding.
+
+| node_id | start_date               | end_date                 | date_diff |
+| ------- | ------------------------ | ------------------------ | --------- |
+| 1       | 2020-01-02T00:00:00.000Z | 2020-01-03T00:00:00.000Z | 1         |
+| 1       | 2020-01-04T00:00:00.000Z | 2020-01-10T00:00:00.000Z | 6         |
+| 2       | 2020-01-11T00:00:00.000Z | 2020-01-17T00:00:00.000Z | 6         |
+| 1       | 2020-01-18T00:00:00.000Z | 2020-01-26T00:00:00.000Z | 8         |
+| 1       | 2020-01-27T00:00:00.000Z | 2020-01-31T00:00:00.000Z | 4         |
+| 1       | 2020-02-01T00:00:00.000Z | 2020-02-10T00:00:00.000Z | 9         |
+
+Now I will give you 3 questions. The solutions will be just down below but hidden as spoilers. First try to answer these questions for yourself.
+
+**Q1. How many days on average does it take for the customer to get reallocated?**
+Mathematical Solution : ||(1+6+6+8+4+9)/6 = 5.66||
+Query : ||SELECT avg(date_diff) FROM nodes;||
 #### Final Query
 
 #### Output Table
