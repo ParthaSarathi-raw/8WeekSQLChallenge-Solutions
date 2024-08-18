@@ -137,7 +137,7 @@ Now I will give you 3 questions. The solutions will be just down below but hidde
 <br>
 <details>
   <summary>Mathematical Solution (Click me to see answer)</summary>
-    (1+6+8+4+9)+6/2 = 17
+    ((1+6+8+4+9)+6)/2 = 17
 </details>
 <details>
   <summary>Query (Click me to see answer)</summary>
@@ -151,7 +151,7 @@ Will the answer be same as Q1? Lets find out.
 <br>
 <details>
   <summary>Mathematical Solution (Click me to see answer)</summary>
-    (1+6)+(6)+(8+4+9)/3 = 11.33 -> In this case first 2 rows should be treated as one because he is still on same node. Similarly last 3 rows should be treated as one beacause they all are same node.
+    ((1+6)+(6)+(8+4+9))/3 = 11.33 -> In this case first 2 rows should be treated as one because he is still on same node. Similarly last 3 rows should be treated as one beacause they all are same node.
 </details>
 <details>
   <summary>Query (Click me to see answer)</summary>
