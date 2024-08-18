@@ -466,6 +466,45 @@ FROM CTE;
 
 - Exactly everything, including the 17th decimal is also the same in both the approaches.
 
+## Using Approach'2 Logic to Created Combined Table (Not so lengthy)
+- Again I feel like we've spent way too much time on this problem, but the reason I decided to create combined table through lengthy process is because it is easier to understand, but however with some neat math tricks like using cumulative sum, you are able to create combined table in a much shorter way.
+```` sql
+WITH CTE as (SELECT n.*,case when node_id != lag(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) then 1 else 0 end as node_switched FROM data_bank.customer_nodes n WHERE end_date != '9999-12-31')
+,CTE2 as (SELECT cte.*,sum(node_switched) OVER(PARTITION BY customer_id ORDER BY start_date) as cum_sum FROM CTE)
+SELECT customer_id,region_id,node_id,min(start_date) as start_date,max(end_date) as end_date FROM CTE2 GROUP BY customer_id,region_id,node_id,cum_sum ORDER BY 1,4;
+````
+- Just showing rows for first 5 customers.
+
+| customer_id | region_id | node_id | start_date               | end_date                 |
+| ----------- | --------- | ------- | ------------------------ | ------------------------ |
+| 1           | 3         | 4       | 2020-01-02T00:00:00.000Z | 2020-01-14T00:00:00.000Z |
+| 1           | 3         | 2       | 2020-01-15T00:00:00.000Z | 2020-01-16T00:00:00.000Z |
+| 1           | 3         | 5       | 2020-01-17T00:00:00.000Z | 2020-01-28T00:00:00.000Z |
+| 1           | 3         | 3       | 2020-01-29T00:00:00.000Z | 2020-02-18T00:00:00.000Z |
+| 1           | 3         | 2       | 2020-02-19T00:00:00.000Z | 2020-03-16T00:00:00.000Z |
+| 2           | 3         | 5       | 2020-01-03T00:00:00.000Z | 2020-01-17T00:00:00.000Z |
+| 2           | 3         | 3       | 2020-01-18T00:00:00.000Z | 2020-02-21T00:00:00.000Z |
+| 2           | 3         | 5       | 2020-02-22T00:00:00.000Z | 2020-03-07T00:00:00.000Z |
+| 2           | 3         | 2       | 2020-03-08T00:00:00.000Z | 2020-03-12T00:00:00.000Z |
+| 2           | 3         | 4       | 2020-03-13T00:00:00.000Z | 2020-03-13T00:00:00.000Z |
+| 3           | 5         | 4       | 2020-01-27T00:00:00.000Z | 2020-02-18T00:00:00.000Z |
+| 3           | 5         | 5       | 2020-02-19T00:00:00.000Z | 2020-03-06T00:00:00.000Z |
+| 3           | 5         | 3       | 2020-03-07T00:00:00.000Z | 2020-03-24T00:00:00.000Z |
+| 3           | 5         | 4       | 2020-03-25T00:00:00.000Z | 2020-04-08T00:00:00.000Z |
+| 3           | 5         | 1       | 2020-04-09T00:00:00.000Z | 2020-04-09T00:00:00.000Z |
+| 3           | 5         | 4       | 2020-04-10T00:00:00.000Z | 2020-04-24T00:00:00.000Z |
+| 4           | 5         | 4       | 2020-01-07T00:00:00.000Z | 2020-02-13T00:00:00.000Z |
+| 4           | 5         | 3       | 2020-02-14T00:00:00.000Z | 2020-03-02T00:00:00.000Z |
+| 4           | 5         | 5       | 2020-03-03T00:00:00.000Z | 2020-03-12T00:00:00.000Z |
+| 4           | 5         | 3       | 2020-03-13T00:00:00.000Z | 2020-04-01T00:00:00.000Z |
+| 5           | 3         | 3       | 2020-01-15T00:00:00.000Z | 2020-01-23T00:00:00.000Z |
+| 5           | 3         | 1       | 2020-01-24T00:00:00.000Z | 2020-02-05T00:00:00.000Z |
+| 5           | 3         | 4       | 2020-02-06T00:00:00.000Z | 2020-02-15T00:00:00.000Z |
+| 5           | 3         | 2       | 2020-02-16T00:00:00.000Z | 2020-02-29T00:00:00.000Z |
+| 5           | 3         | 5       | 2020-03-01T00:00:00.000Z | 2020-03-05T00:00:00.000Z |
+
+- I hope you can understand that when we do group by cum_sum , all the adjacent rows which have same node will get combined into one. This is the shortcut. If you don't understand, feel free to comment, I will try to explain it in detail.
+
 #### Another Final Note
 - What we did here is found the average of days across the whole dataset in a single aggregation.
 - One could argue that instead of finding overall average, it would be better to find the average of days for each customer first and then find the average across all the customers.
@@ -477,6 +516,9 @@ FROM CTE;
 - Lets say there are customers who are the creators of the data_bank itself like danny and team. Because they are special, they don't get reallocated much often. So the no. of days these special customers stay in the nodes is significantly different from other regular users.
 - In this case, the deviation between avg(across) and avg(avg(each customer)) increases. In the broad scope as there will be a lot of regular customers which are much higher than these special customers, it won't matter that much, but the difference between these two values increases when compared to the previous case where there are no special users.
 - If you are really interested in this topic, I suggest you to go through **Simpson's Paradox (Weighted Average Dilemma)**, where you can gain even deeper understand of this problem and decide which type of avg depending on the specific need.
+
+<br>
+
 **5.	What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
 
 #### Final Query
