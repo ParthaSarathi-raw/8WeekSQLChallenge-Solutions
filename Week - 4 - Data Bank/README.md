@@ -466,7 +466,7 @@ FROM CTE;
 
 - Exactly everything, including the 17th decimal is also the same in both the approaches.
 
-## Using Approach'2 Logic to Created Combined Table (Not so lengthy)
+## Using Approach - 2's Logic to Created Combined Table (Not so lengthy)
 - Again I feel like we've spent way too much time on this problem, but the reason I decided to create combined table through lengthy process is because it is easier to understand, but however with some neat math tricks like using cumulative sum, you are able to create combined table in a much shorter way.
 ```` sql
 WITH CTE as (SELECT n.*,case when node_id != lag(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) then 1 else 0 end as node_switched FROM data_bank.customer_nodes n WHERE end_date != '9999-12-31')
@@ -515,16 +515,45 @@ SELECT customer_id,region_id,node_id,min(start_date) as start_date,max(end_date)
 - These 2 values in the above problem give the same result because all the customers are **treated equally (same weightage)** by data_bank system while alloting nodes.
 - Lets say there are customers who are the creators of the data_bank itself like danny and team. Because they are special, they don't get reallocated much often. So the no. of days these special customers stay in the nodes is significantly different from other regular users.
 - In this case, the deviation between avg(across) and avg(avg(each customer)) increases. In the broad scope as there will be a lot of regular customers which are much higher than these special customers, it won't matter that much, but the difference between these two values increases when compared to the previous case where there are no special users.
-- If you are really interested in this topic, I suggest you to go through **Simpson's Paradox (Weighted Average Dilemma)**, where you can gain even deeper understand of this problem and decide which type of avg depending on the specific need.
+- If you are really interested in this topic, I suggest you to go through **Simpson's Paradox (Weighted Average Dilemma)**, where you can gain even deeper understand of this problem and decide which type of avg to use depending on the specific need.
 
 <br>
 
 **5.	What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
-
+It is mentioned for this same reallocation days metric. So in this case we need to use combined table. Again if you've skipped approach 1, this is universe telling you to don't skip it lol.
+Anyway coming to the question, we can calculate percentile in the general way. It can be done generally but it takes a lot of time. Hence by default there will be functions which can directly calculate percentiles. 
+- We will be using `percentile_disc` function in postgre sql to solve this problem. The percentiles could change depending on the dialect you are using.
+- Also research on when to use percentile discrete and percentile continous if you don't know the difference between them.
 #### Final Query
+```` sql
+WITH CTE as (SELECT n.*,case when node_id != lag(node_id) OVER (PARTITION BY customer_id ORDER BY start_date) then 1 else 0 end as node_switched FROM data_bank.customer_nodes n WHERE end_date != '9999-12-31')
+,CTE2 as (SELECT cte.*,sum(node_switched) OVER(PARTITION BY customer_id ORDER BY start_date) as cum_sum FROM CTE)
+,CTE3 as (SELECT customer_id,region_id,node_id,min(start_date) as start_date,max(end_date) as end_date FROM CTE2 GROUP BY customer_id,region_id,node_id,cum_sum ORDER BY 1,4)
+,CTE4 as (SELECT CTE3.*,end_date-start_date + 1 as days_stayed FROM CTE3)
+SELECT cte4.region_id,region_name,
+       percentile_disc(0.5) within group ( order by days_stayed) as "50th percentile",
+       percentile_disc(0.8) within group ( order by days_stayed) as "80th percentile",
+       percentile_disc(0.95) within group ( order by days_stayed) as "95th percentile"
+FROM CTE4 JOIN data_bank.regions  r ON  cte4.region_id = r.region_id
+GROUP BY cte4.region_id,region_name;
+````
+
 
 #### Output Table
- 
+
+ | region_id | region_name | 50th percentile | 80th percentile | 95th percentile |
+| --------- | ----------- | --------------- | --------------- | --------------- |
+| 1         | Australia   | 18              | 27              | 42              |
+| 2         | America     | 18              | 27              | 38              |
+| 3         | Africa      | 18              | 28              | 40              |
+| 4         | Asia        | 18              | 27              | 41              |
+| 5         | Europe      | 19              | 28              | 39              |
+
+Yes I know my percentile values, especially the 95th percentile column values are very different from other online solutions available. This is because no one bothered to actually combine the rows which have same node id.
+
+- However if you feel like I've made a mistake some where, please feel free to let me know, so I will correct it.
+
+---
 
 ## Customer Transactions Solutions
 
