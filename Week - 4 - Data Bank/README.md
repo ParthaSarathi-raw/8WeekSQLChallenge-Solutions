@@ -521,9 +521,10 @@ SELECT customer_id,region_id,node_id,min(start_date) as start_date,max(end_date)
 <br>
 
 **5.	What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
-It is mentioned for this same reallocation days metric. So in this case we need to use combined table. Again if you've skipped approach 1, this is universe telling you to don't skip it lol.
-Anyway coming to the question, we can calculate percentile in the general way. It can be done generally but it takes a lot of time. Hence by default there will be functions which can directly calculate percentiles. 
-- We will be using `percentile_disc` function in postgre sql to solve this problem. The percentiles could change depending on the dialect you are using.
+
+It is mentioned **for this same reallocation days metric** in the question. So in this case we need to use combined table. Again if you've skipped approach 1, this is universe telling you to don't skip it lol.
+Anyways coming to the question, we can calculate percentile in the general way. It can be done generally but it takes a lot of time. Hence by default there will be functions which can directly calculate percentiles. 
+- We will be using `percentile_disc` function in postgre sql to solve this problem. The percentile functions could change depending on the dialect you are using.
 - Also research on when to use percentile discrete and percentile continous if you don't know the difference between them.
 #### Final Query
 ```` sql
