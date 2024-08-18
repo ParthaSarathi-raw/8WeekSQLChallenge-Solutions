@@ -164,7 +164,7 @@ Will the answer be same as Q1? Lets find out.
 
 ---
 
-### Note : In the above answers that I've given for Q1,Q2 and Q3, there is a small flaw. Notice that date_diff is not same as no. of days stayed on that node. For no. of days stayed on that node, the correct answer would be date_diff + 1. But for keeping it simplcity, I'm ignoring the  " + 1 " in the calculation for now, but this can easily be fixed at the end by adding + 1 to date_diff. I just wanted you to know if you're wondering why am I complaining about wrong solutions available on the internet and I myself am giving wrong solutions lol.  
+### Note : In the above answers that I've given for Q1,Q2 and Q3, there is a small flaw. Notice that date_diff is not same as no. of days stayed on that node. For no. of days stayed on that node, the correct answer would be date_diff + 1. But for the sake of simplicity, I'm ignoring the  " + 1 " in the calculation for now, but this can easily be fixed at the end by adding + 1 to date_diff. I just wanted you to know if you're wondering why am I complaining about wrong solutions available on the internet and I myself am giving wrong solutions lol.  
 
 ---
 
