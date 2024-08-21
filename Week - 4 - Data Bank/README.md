@@ -708,7 +708,7 @@ sum(case
 
 - Only showing values for first 5 customers.
 - But few months in between are missing right? Since we only have data of 4 months, I would like to generate balances for 4 months.
-- Look at the following final query which includes missing months as well, which is achieved using generate_series. By this point I hope you can understand these confusing queries as well.
+- Look at the following final query which includes missing months as well, which is achieved using generate_series.
 
 #### Final Query
 
@@ -872,3 +872,348 @@ FROM (
 | 33.20             |
 
 ---
+
+## Data Allocation Challenge
+
+- When I first heard this question, I had no idea what it actually meant. I actually thought of skipping this because it made no sense to me. Then I re-read the introduction part and I found this sentence "Customers are allocated cloud data storage limits which are directly linked to how much money they have in their accounts".
+-  I'm guessing the cloud storage data is directly proportional to the amount of balance in the account? I'm moving forward with this assumption.
+-  Like for every 100$ in your balance, you will get 1GB of cloud storage.
+
+
+
+### running customer balance column that includes the impact each transaction
+
+- We need impact of each transaction, so instead of grouping by month, we won't do any grouping.
+
+```` sql
+SELECT 
+    customer_id,
+    txn_date,
+    txn_type,
+    txn_amount,
+    SUM(
+        CASE 
+            WHEN txn_type = 'deposit' THEN txn_amount 
+            ELSE -txn_amount 
+        END
+    ) OVER (
+        PARTITION BY customer_id 
+        ORDER BY txn_date
+    ) AS current_balance
+FROM 
+    data_bank.customer_transactions;
+````
+
+- Only including data for 3 customers.
+
+| customer_id | txn_date                 | txn_type   | txn_amount | current_balance |
+| ----------- | ------------------------ | ---------- | ---------- | --------------- |
+| 1           | 2020-01-02T00:00:00.000Z | deposit    | 312        | 312             |
+| 1           | 2020-03-05T00:00:00.000Z | purchase   | 612        | -300            |
+| 1           | 2020-03-17T00:00:00.000Z | deposit    | 324        | 24              |
+| 1           | 2020-03-19T00:00:00.000Z | purchase   | 664        | -640            |
+| 2           | 2020-01-03T00:00:00.000Z | deposit    | 549        | 549             |
+| 2           | 2020-03-24T00:00:00.000Z | deposit    | 61         | 610             |
+| 3           | 2020-01-27T00:00:00.000Z | deposit    | 144        | 144             |
+| 3           | 2020-02-22T00:00:00.000Z | purchase   | 965        | -821            |
+| 3           | 2020-03-05T00:00:00.000Z | withdrawal | 213        | -1034           |
+| 3           | 2020-03-19T00:00:00.000Z | withdrawal | 188        | -1222           |
+| 3           | 2020-04-12T00:00:00.000Z | deposit    | 493        | -729            |
+
+- Based on this we need to do data allocation on a monthly basis.
+- Look the only thing that I know is data allocation limit is directly proportional to the balance in the account. So I'm assuming the fact that whenever current_balance is negative no data allocation is required for those customers.
+
+### Data Allocation Done Real Time
+
+- In this case data allocation is done real time, so it doesn't mean that right after txn is done data is updated, but it is updated for each day.
+- So we gotta use `generate_series` to get the current_balance of each customer on every day. However before their first_transaction we are assuming current_balance to be 0, so no need for allocation of data.
+- After generating the data for every day for each customer, we will see how much data is required for each day.
+
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        generate_series(
+            txn_date,
+            CASE 
+                WHEN lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) IS NULL 
+                    THEN '2020-04-30' 
+                ELSE lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) - 1 
+            END,
+            '1 day'
+        ) AS cur_date,
+        SUM(
+            CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount 
+                ELSE -txn_amount 
+            END
+        ) OVER (PARTITION BY customer_id ORDER BY txn_date) AS current_balance
+    FROM data_bank.customer_transactions
+)
+SELECT 
+    cur_date,
+    SUM(CASE WHEN current_balance < 0 THEN 0 ELSE current_balance END) AS data_allocated
+FROM CTE
+GROUP BY cur_date
+ORDER BY 1;
+````
+- Only showing first 5 days. In original ouput, the data would be of 4 months.
+
+| cur_date                 | data_allocated |
+| ------------------------ | -------------- |
+| 2020-01-01T00:00:00.000Z | 12270          |
+| 2020-01-02T00:00:00.000Z | 17830          |
+| 2020-01-03T00:00:00.000Z | 25435          |
+| 2020-01-04T00:00:00.000Z | 36350          |
+| 2020-01-05T00:00:00.000Z | 42574          |
+
+- Now that we have each days data_allocation required, and we are needed to do analysis on monthly.
+- Here for monthly we can take the avg(data_allocated), that would be fair, but I want to take max(data_allocated) because our cloud servers must be capable of handling huge data which exceeds average limit.
+
+```` sql
+SELECT extract(month from cur_date) as month,max(data_allocated) as max_data_allocated FROM (SELECT 
+    cur_date,
+    SUM(CASE WHEN current_balance < 0 THEN 0 ELSE current_balance END) AS data_allocated
+FROM CTE
+GROUP BY cur_date
+ORDER BY 1) temp
+GROUP BY 1;
+````
+| month | max_data_allocated |
+| ----- | ------------------ |
+| 1     | 236157             |
+| 2     | 274699             |
+| 3     | 275616             |
+| 4     | 266913             |
+
+- The conversion rate could be like for every 100 $, 1GB of cloud data is allocated. So for month 1 January, 2361 GB of cloud data storage is allocated overall for all customers.
+
+---
+
+### customer balance at the end of each month
+
+- We have already done this, so directly jumping to the query of data allocation
+
+### Data Allocation done based on previous month's balance.
+
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        generate_series(
+            extract(month from txn_date)::integer,
+            CASE 
+                WHEN lead(extract(month from txn_date)) OVER (PARTITION BY customer_id ORDER BY txn_date) IS NULL 
+                    THEN 4 
+                ELSE (lead(extract(month from txn_date)) OVER (PARTITION BY customer_id ORDER BY txn_date) - 1 )::integer
+            END,
+            1
+        ) AS month,
+        SUM(
+            CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount 
+                ELSE -txn_amount 
+            END
+        ) OVER (PARTITION BY customer_id ORDER BY txn_date) AS current_balance
+    FROM data_bank.customer_transactions
+)
+SELECT month,sum(case when current_balance <0 then 0 else current_balance end) as total_data_allocation FROM CTE GROUP BY month ORDER BY month;
+
+````
+
+| month | total_data_allocation |
+| ----- | --------------------- |
+| 1     | 235595                |
+| 2     | 261508                |
+| 3     | 260971                |
+| 4     | 264857                |
+
+- Also I'd like to point out that in real-time allocation, for month 1 the data allocated is for that month only. Where as here in month 1, the calculated data will be assigned to the next month i.e month 2 and so on.
+
+---
+
+### minimum, average and maximum values of the running balance for each customer
+
+- I'd like to point out that min and max values can be calculated directly, but avg cannot be calculated directly.
+- Lets say I have 100$ at the beginning of January. And at the last day of January I deposited 400$ to make my balance equal to 500 $ total. Min is 100$ and max is 500$, but what is average? It is should be close to 100$, not (100+500)/2.
+- So we need to do these calculations on another table which has each and every day generated including from the starting of year 2020.
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        generate_series(
+            txn_date,
+            CASE 
+                WHEN lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) IS NULL 
+                    THEN '2020-04-30' 
+                ELSE lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) - 1 
+            END,
+            '1 day'
+        ) AS cur_date,
+        SUM(
+            CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount 
+                ELSE -txn_amount 
+            END
+        ) OVER (PARTITION BY customer_id ORDER BY txn_date) AS current_balance
+    FROM data_bank.customer_transactions
+)
+SELECT * FROM (
+SELECT customer_id,GENERATE_SERIES('2020-01-01',min(cur_date)-'1 day'::interval,'1 day') as cur_date,0 as current_balance FROM CTE GROUP BY customer_id
+UNION ALL
+SELECT * FROM CTE) temp ORDER BY customer_id,cur_date;
+````
+- This query gives each and every day's data for every customer without missing a day. Now on this we need to do monthly basis for each customer by doing min,max and avg.
+
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        generate_series(
+            txn_date,
+            CASE 
+                WHEN lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) IS NULL 
+                    THEN '2020-04-30' 
+                ELSE lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) - 1 
+            END,
+            '1 day'
+        ) AS cur_date,
+        SUM(
+            CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount 
+                ELSE -txn_amount 
+            END
+        ) OVER (PARTITION BY customer_id ORDER BY txn_date) AS current_balance
+    FROM data_bank.customer_transactions
+),
+CTE2 as(
+SELECT * FROM (
+SELECT customer_id,GENERATE_SERIES('2020-01-01',min(cur_date)-'1 day'::interval,'1 day') as cur_date,0 as current_balance FROM CTE GROUP BY customer_id
+UNION ALL
+SELECT * FROM CTE) temp ORDER BY customer_id,cur_date)
+SELECT customer_id,extract(month from cur_date) as month,min(current_balance) as min_bal,max(current_balance) as max_bal, avg(current_balance) as avg_bal FROM CTE2 GROUP BY 1,2 ORDER BY 1,2;
+````
+- Showing data for 5 customers only.
+
+ customer_id | month | min_bal | max_bal | avg_bal                |
+| ----------- | ----- | ------- | ------- | ---------------------- |
+| 1           | 1     | 0       | 312     | 301.9354838709677419   |
+| 1           | 2     | 312     | 312     | 312.0000000000000000   |
+| 1           | 3     | -640    | 312     | -342.7096774193548387  |
+| 1           | 4     | -640    | -640    | -640.0000000000000000  |
+| 2           | 1     | 0       | 549     | 513.5806451612903226   |
+| 2           | 2     | 549     | 549     | 549.0000000000000000   |
+| 2           | 3     | 549     | 610     | 564.7419354838709677   |
+| 2           | 4     | 610     | 610     | 610.0000000000000000   |
+| 3           | 1     | 0       | 144     | 23.2258064516129032    |
+| 3           | 2     | -821    | 144     | -122.2068965517241379  |
+| 3           | 3     | -1222   | -821    | -1085.3548387096774194 |
+| 3           | 4     | -1222   | -729    | -909.7666666666666667  |
+| 4           | 1     | 0       | 848     | 507.7419354838709677   |
+| 4           | 2     | 848     | 848     | 848.0000000000000000   |
+| 4           | 3     | 655     | 848     | 804.4193548387096774   |
+| 4           | 4     | 655     | 655     | 655.0000000000000000   |
+| 5           | 1     | 0       | 1780    | 689.4838709677419355   |
+| 5           | 2     | 954     | 954     | 954.0000000000000000   |
+| 5           | 3     | -1923   | 954     | 91.3870967741935484    |
+| 5           | 4     | -2413   | -1923   | -2396.6666666666666667 |
+
+### Data Allocation based on average balance in previous 30 days.
+
+- I'd say the question contradicts itself.
+- If we are doing data allocation based on avg balance of previous 30 days, then it means that it is being updated real time for every day.
+- Then again they wanted us to do analysis on monthly basis.
+- So I'm gonna solve this like I solved in the 1st case, i.e taking the maximum data allocated out of each day for every month.
+
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        generate_series(
+            txn_date,
+            CASE 
+                WHEN lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) IS NULL 
+                    THEN '2020-04-30' 
+                ELSE lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) - 1 
+            END,
+            '1 day'
+        ) AS cur_date,
+        SUM(
+            CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount 
+                ELSE -txn_amount 
+            END
+        ) OVER (PARTITION BY customer_id ORDER BY txn_date) AS current_balance
+    FROM data_bank.customer_transactions
+),
+CTE2 as(
+SELECT * FROM (
+SELECT customer_id,GENERATE_SERIES('2020-01-01',min(cur_date)-'1 day'::interval,'1 day') as cur_date,0 as current_balance FROM CTE GROUP BY customer_id
+UNION ALL
+SELECT * FROM CTE) temp ORDER BY customer_id,cur_date)
+SELECT customer_id,cur_date,avg(current_balance) OVER(PARTITION BY customer_id ORDER BY cur_date ROWS BETWEEN 30 PRECEDING AND CURRENT ROW) as avg_bal FROM CTE2;
+````
+- The above query gives us avg_bal in last 30 days for everyday between january and april for each customer. Now all we gotta do is based on this value, find the data_allocated for each day and take out max for each month.
+- Also don't forget, when avg_bal < 0 , data allocated will be 0.
+
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        generate_series(
+            txn_date,
+            CASE 
+                WHEN lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) IS NULL 
+                    THEN '2020-04-30' 
+                ELSE lead(txn_date) OVER (PARTITION BY customer_id ORDER BY txn_date) - 1 
+            END,
+            '1 day'
+        ) AS cur_date,
+        SUM(
+            CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount 
+                ELSE -txn_amount 
+            END
+        ) OVER (PARTITION BY customer_id ORDER BY txn_date) AS current_balance
+    FROM data_bank.customer_transactions
+),
+CTE2 AS (
+    SELECT * FROM (
+        SELECT customer_id, GENERATE_SERIES('2020-01-01', min(cur_date) - '1 day'::interval, '1 day') AS cur_date, 0 AS current_balance 
+        FROM CTE 
+        GROUP BY customer_id
+        UNION ALL
+        SELECT * FROM CTE
+    ) temp 
+    ORDER BY customer_id, cur_date
+),
+CTE3 AS (
+    SELECT cur_date, ROUND(SUM(CASE WHEN avg_bal < 0 THEN 0 ELSE avg_bal END)) AS total_data_allocated 
+    FROM (
+        SELECT customer_id, cur_date, AVG(current_balance) OVER (PARTITION BY customer_id ORDER BY cur_date ROWS BETWEEN 30 PRECEDING AND CURRENT ROW) AS avg_bal 
+        FROM CTE2
+    ) temp
+    GROUP BY 1 
+    ORDER BY 1
+)
+SELECT 
+    EXTRACT(month FROM cur_date) AS month, 
+    MAX(total_data_allocated) AS data_allocated_for_every_customer 
+FROM CTE3 
+GROUP BY 1;
+````
+| month | data_allocated_for_every_customer |
+| ----- | --------------------------------- |
+| 1     | 124579                            |
+| 2     | 243353                            |
+| 3     | 256572                            |
+| 4     | 257031                            |
+
+- The data_allocated_values could change based on our assumption for first txn.
+- What I assumed is that before first txn, the cur_bal will be 0. So when a customer deposited 100$ at the end of 1st month, the avg will be close to 0.
+- However what if the customer just signed up for data_bank on last day of January and deposited 100$, then his average should be 100$ only, not 0$.
+- Keep this in mind, if we have more information on this, we can calculate even more accurate answer. But for this question I'm moving forward with the first assumption that every customer is already part of data_bank and has 0 as their cur_balance from 1st of January, 2020.
+
+---
+
+
