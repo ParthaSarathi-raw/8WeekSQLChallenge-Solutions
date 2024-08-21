@@ -788,9 +788,9 @@ FROM
 
 **5.	What is the percentage of customers who increase their closing balance by more than 5%?**
 
-- Again this is not tricky just a straight forward question. The only thing that is not mentioned is are they talking about successive months or for initial and final months.
-- So I'm calculating this for 5% between month 1 and month 4 as they are initial and final months.
-- Also the closing_balances are negative, so make sure to use abs() whenever necessay while making calculations.
+- Again this is not tricky just a straight forward question. The only thing that is not mentioned is whether they are talking about successive months or for initial and final months.
+- So I'm calculating this answer by taking month 1 and month 4 as reference as they are initial and final months.
+- Also the closing_balances are negative, so make sure to use `abs(closing_balance)` whenever necessay while making calculations.
 
 #### Final Query
 
