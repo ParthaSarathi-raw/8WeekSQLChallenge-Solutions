@@ -678,15 +678,197 @@ First let us try to find the net_txn_amount for each month.
 - Then we need to find the net_txn_amount for each customer for each month  so : `GROUP BY month,customer_id`
 - To find the net_txn_amount we can use case statements : `sum(case when txn_type = 'deposit' then txn_amount else  -txn_amount end)`
 - We will pass this table as subquery and do running total across each month for each customer to get the closing amount for each month.
-- 
+```` sql
+SELECT customer_id,month,sum(net_value_per_month) OVER(PARTITION BY customer_id ORDER BY month) as closing_balance FROM (
+
+SELECT extract(month from txn_date) as month,customer_id,
+sum(case 
+    when txn_type = 'deposit' then txn_amount
+    else  -txn_amount
+    end
+    ) as net_value_per_month FROM data_bank.customer_transactions
+    GROUP BY 1,2
+    ORDER BY 2,1) temp
+````
+| customer_id | month | closing_balance |
+| ----------- | ----- | --------------- |
+| 1           | 1     | 312             |
+| 1           | 3     | -640            |
+| 2           | 1     | 549             |
+| 2           | 3     | 610             |
+| 3           | 1     | 144             |
+| 3           | 2     | -821            |
+| 3           | 3     | -1222           |
+| 3           | 4     | -729            |
+| 4           | 1     | 848             |
+| 4           | 3     | 655             |
+| 5           | 1     | 954             |
+| 5           | 3     | -1923           |
+| 5           | 4     | -2413           |
+
+- Only showing values for first 5 customers.
+- But few months in between are missing right? Since we only have data of 4 months, I would like to generate balances for 4 months.
+- Look at the following final query which includes missing months as well, which is achieved using generate_series. By this point I hope you can understand these confusing queries as well.
 
 #### Final Query
 
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        month,
+        SUM(net_value_per_month) OVER (PARTITION BY customer_id ORDER BY month) AS closing_balance
+    FROM (
+        SELECT 
+            EXTRACT(MONTH FROM txn_date) AS month,
+            customer_id,
+            SUM(CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount
+                ELSE -txn_amount
+            END) AS net_value_per_month
+        FROM 
+            data_bank.customer_transactions
+        GROUP BY 
+            1, 2
+        ORDER BY 
+            2, 1
+    ) temp
+),
+CTE2 AS (
+    SELECT 
+        customer_id,
+        month,
+        LEAD(month) OVER (PARTITION BY customer_id ORDER BY month) AS next_month,
+        closing_balance
+    FROM 
+        CTE
+)
+SELECT 
+    customer_id,
+    GENERATE_SERIES(
+        month::INTEGER,
+        CASE 
+            WHEN next_month IS NULL THEN 4
+            ELSE next_month::INTEGER - 1
+        END,
+        1
+    ) AS month,
+    closing_balance
+FROM 
+    CTE2;
+````
+
 #### Output Table
- 
+- Only showing values for 5 customers only. In final table it has 500 customers x 4 rows per customers = 2000 rows
+
+ | customer_id | month | closing_balance |
+| ----------- | ----- | --------------- |
+| 1           | 1     | 312             |
+| 1           | 2     | 312             |
+| 1           | 3     | -640            |
+| 1           | 4     | -640            |
+| 2           | 1     | 549             |
+| 2           | 2     | 549             |
+| 2           | 3     | 610             |
+| 2           | 4     | 610             |
+| 3           | 1     | 144             |
+| 3           | 2     | -821            |
+| 3           | 3     | -1222           |
+| 3           | 4     | -729            |
+| 4           | 1     | 848             |
+| 4           | 2     | 848             |
+| 4           | 3     | 655             |
+| 4           | 4     | 655             |
+| 5           | 1     | 954             |
+| 5           | 2     | 954             |
+| 5           | 3     | -1923           |
+| 5           | 4     | -2413           |
+
+---
+
 **5.	What is the percentage of customers who increase their closing balance by more than 5%?**
 
+- Again this is not tricky just a straight forward question. The only thing that is not mentioned is are they talking about successive months or for initial and final months.
+- So I'm calculating this for 5% between month 1 and month 4 as they are initial and final months.
+- Also the closing_balances are negative, so make sure to use abs() whenever necessay while making calculations.
+
 #### Final Query
 
+```` sql
+WITH CTE AS (
+    SELECT 
+        customer_id,
+        month,
+        SUM(net_value_per_month) OVER (PARTITION BY customer_id ORDER BY month) AS closing_balance
+    FROM (
+        SELECT 
+            EXTRACT(MONTH FROM txn_date) AS month,
+            customer_id,
+            SUM(CASE 
+                WHEN txn_type = 'deposit' THEN txn_amount
+                ELSE -txn_amount
+            END) AS net_value_per_month
+        FROM 
+            data_bank.customer_transactions
+        GROUP BY 
+            1, 2
+        ORDER BY 
+            2, 1
+    ) temp
+),
+CTE2 AS (
+    SELECT 
+        customer_id,
+        month,
+        LEAD(month) OVER (PARTITION BY customer_id ORDER BY month) AS next_month,
+        closing_balance
+    FROM 
+        CTE
+),
+closing_balance_table AS (
+    SELECT 
+        customer_id,
+        GENERATE_SERIES(
+            month::INTEGER,
+            CASE 
+                WHEN next_month IS NULL THEN 4
+                ELSE next_month::INTEGER - 1
+            END,
+            1
+        ) AS month,
+        closing_balance
+    FROM 
+        CTE2
+)
+SELECT 
+    ROUND(
+        100.0 * SUM(
+            CASE 
+                WHEN final_closing_balance > (closing_balance + (0.05 * ABS(closing_balance))) 
+                THEN 1 
+                ELSE 0 
+            END
+        ) / NULLIF(SUM(CASE WHEN final_closing_balance IS NOT NULL THEN 1 ELSE 0 END), 0), 
+        2
+    ) AS perc_of_customers
+FROM (
+    SELECT 
+        t.*,
+        CASE 
+            WHEN month = 1 
+            THEN LEAD(closing_balance) OVER (PARTITION BY customer_id ORDER BY month) 
+        END AS final_closing_balance
+    FROM 
+        closing_balance_table t
+    WHERE 
+        month IN (1, 4)
+) temp;
+````
+
 #### Output Table
- 
+
+ | perc_of_customers |
+| ----------------- |
+| 33.20             |
+
+---
