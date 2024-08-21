@@ -561,23 +561,124 @@ Yes I know my percentile values, especially the 95th percentile column values ar
 
 **1.	What is the unique count and total amount for each transaction type?**
 
+Very Simple question so not much explanation needed.
+- For each transaction type : `GROUP BY txn_type`
+- Unique count for each txn_type : `Count(*) or count(txn_type)`
+- Total Amount : `sum(txn_amount)`
+
 #### Final Query
 
+```` sql
+SELECT 
+    txn_type,
+    COUNT(*) AS no_of_txns,
+    SUM(txn_amount) AS total_amount
+FROM 
+    data_bank.customer_transactions
+GROUP BY 
+    txn_type;
+````
+
 #### Output Table
- 
+
+| txn_type   | no_of_txns | total_amount |
+| ---------- | ---------- | ------------ |
+| purchase   | 1617       | 806537       |
+| deposit    | 2671       | 1359168      |
+| withdrawal | 1580       | 793003       |
+
+---
+
 **2.	What is the average total historical deposit counts and amounts for all customers?**
 
+They asked this average value for all customers. 
+- So first we need to `Group By customer_id` first and then apply the averages.
+- we need data for historical deposit : `WHERE txn_type = 'deposit'
+- total deposit counts : `count(*) or count(txn_type)`
+- total amount : `sum(txn_amount)`
+
+Then we pass this table as subquery and find averages to get the output.
+
 #### Final Query
 
+```` sql
+SELECT 
+    ROUND(AVG(no_of_deposit_txns), 2) AS avg_historial_deposit_count_for_all_customers,
+    ROUND(AVG(total_deposited), 2) AS avg_total_amount_deposited_for_all_customers
+FROM (
+    SELECT 
+        customer_id,
+        COUNT(*) AS no_of_deposit_txns,
+        SUM(txn_amount) AS total_deposited
+    FROM 
+        data_bank.customer_transactions
+    WHERE 
+        txn_type = 'deposit'
+    GROUP BY 
+        customer_id
+) temp;
+````
+
 #### Output Table
- 
+
+| avg_historial_deposit_count_for_all_customers | avg_total_amount_deposited_for_all_customers |
+| --------------------------------------------- | -------------------------------------------- |
+| 5.34                                          | 2718.34                                      |
+
+---
+
 **3.	For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?**
-
+- We need the data for each month, so from txn_date, we can get month : `extract(month from txn_date)`
+- We also need counts for no. of deposits, purchases and withdrawls : `sum(case statements)`
+- We need to find these counts for each customer in every month so : `GROUP BY customer_id,month`
+- We will pass this table as subquery and get the count of those customers per every month whose `deposits > 1 and (purchases>0 or withdrawls>0)`
 #### Final Query
 
+```` sql
+SELECT 
+    month,
+    SUM(CASE 
+        WHEN (deposit_count > 1) AND (purchase_count > 0 OR withdrawl_count > 0) 
+        THEN 1 
+        ELSE 0 
+    END) AS no_of_customers
+FROM (
+    SELECT 
+        EXTRACT(MONTH FROM txn_date) AS month,
+        customer_id,
+        SUM(CASE WHEN txn_type = 'deposit' THEN 1 ELSE 0 END) AS deposit_count,
+        SUM(CASE WHEN txn_type = 'purchase' THEN 1 ELSE 0 END) AS purchase_count,
+        SUM(CASE WHEN txn_type = 'withdrawl' THEN 1 ELSE 0 END) AS withdrawl_count
+    FROM 
+        data_bank.customer_transactions
+    GROUP BY 
+        1, 2
+) temp
+GROUP BY 
+    1
+ORDER BY 
+    1;
+````
+
 #### Output Table
+
+| month | no_of_customers |
+| ----- | --------------- |
+| 1     | 128             |
+| 2     | 135             |
+| 3     | 146             |
+| 4     | 55              |
+
+---
  
 **4.	What is the closing balance for each customer at the end of the month?**
+
+First let us try to find the net_txn_amount for each month. 
+- First we need to get month from txn_date : `extract(month from txn_date)`
+- Then we need to find the net_txn_amount for each customer for each month  so : `GROUP BY month,customer_id`
+- To find the net_txn_amount we can use case statements : `sum(case when txn_type = 'deposit' then txn_amount else  -txn_amount end)`
+- We will pass this table as subquery and do running total across each month for each customer to get the closing amount for each month.
+- 
 
 #### Final Query
 
