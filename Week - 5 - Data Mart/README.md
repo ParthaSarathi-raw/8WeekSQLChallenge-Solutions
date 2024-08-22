@@ -166,28 +166,120 @@ ORDER BY 1,2;
 
 **5.	What is the total count of transactions for each platform**
 
-#### Final Query
+- total count of transactions : `sum(transactions)`
+- for each platform : `GROUP BY platform`
 
+#### Final Query
+```` sql
+SELECT platform,sum(transactions) as total_transactions FROM CTE 
+GROUP BY platform;
+````
 #### Final Output
- 
+
+ | platform | total_transactions |
+| -------- | ------------------ |
+| Shopify  | 5925169            |
+| Retail   | 1081934227         |
+
+---
+
 **6.	What is the percentage of sales for Retail vs Shopify for each month?**
 
+- For each month : `GROUP BY month_number`
+- For the calculation of percentages, we first use `case(statement)` to find the sales for retail as well as shopify for each month. Then from that we can easily calculate percentages.
+
 #### Final Query
+```` sql
+SELECT 
+    month_number,
+    ROUND(100.0 * shopify_sales / (shopify_sales + retail_sales), 2) AS shopify_percentage,
+    ROUND(100.0 * retail_sales / (shopify_sales + retail_sales), 2) AS retail_percentage
+FROM (
+    SELECT 
+        month_number,
+        SUM(CASE WHEN platform = 'Shopify' THEN sales END) AS shopify_sales,
+        SUM(CASE WHEN platform = 'Retail' THEN sales END) AS retail_sales
+    FROM CTE 
+    GROUP BY month_number
+    ORDER BY month_number
+) temp;
+````
 
 #### Final Output
+
+
+| month_number | shopify_percentage | retail_percentage |
+| ------------ | ------------------ | ----------------- |
+| 3            | 2.46               | 97.54             |
+| 4            | 2.41               | 97.59             |
+| 5            | 2.70               | 97.30             |
+| 6            | 2.73               | 97.27             |
+| 7            | 2.71               | 97.29             |
+| 8            | 2.92               | 97.08             |
+| 9            | 2.62               | 97.38             |
+
+---
+
  
 **7.	What is the percentage of sales by demographic for each year in the dataset?**
 
+- Exactly similar to previous question, so directly jumping to query.
+
 #### Final Query
 
+````sql
+SELECT 
+    calender_year,
+    ROUND(100.0 * couples_sales / (couples_sales + families_sales + unknown_sales), 2) AS couples_percentage,
+    ROUND(100.0 * families_sales / (couples_sales + families_sales + unknown_sales), 2) AS families_percentage,
+    ROUND(100.0 * unknown_sales / (couples_sales + families_sales + unknown_sales), 2) AS unknown_percentage
+FROM (
+    SELECT 
+        calender_year,
+        SUM(CASE WHEN demographic = 'Couples' THEN sales END) AS couples_sales,
+        SUM(CASE WHEN demographic = 'Families' THEN sales END) AS families_sales,
+  		SUM(CASE WHEN demographic = 'unknown' THEN sales END) as unknown_sales
+    FROM CTE 
+    GROUP BY 1
+    ORDER BY 1
+) temp;
+````
+
 #### Final Output
+
+| calender_year | couples_percentage | families_percentage | unknown_percentage |
+| ------------- | ------------------ | ------------------- | ------------------ |
+| 2018          | 26.38              | 31.99               | 41.63              |
+| 2019          | 27.28              | 32.47               | 40.25              |
+| 2020          | 28.72              | 32.73               | 38.55              |
+
+---
+
+
  
 **8.	Which age_band and demographic values contribute the most to Retail sales?**
 
+- We need data for Retial sales only : `WHERE platform = 'Retail'`
+- We need age_band and demographic values : `SELECT age_band,demographic`
+- Contributes the most : `ORDER BY sum(sales) DESC LIMIT 1`
+
 #### Final Query
+```` sql
+SELECT age_band,demographic FROM cte 
+WHERE platform = 'Retail'
+GROUP BY 1,2 
+ORDER BY sum(sales) DESC 
+LIMIT 1;
+````
 
 #### Final Output
  
+| age_band | demographic |
+| -------- | ----------- |
+| unknown  | unknown     |
+
+---
+
 **9.	Can we use the avg_transaction column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?**
 
 #### Final Query
