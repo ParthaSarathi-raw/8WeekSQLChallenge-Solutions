@@ -1216,4 +1216,7 @@ GROUP BY 1;
 
 ---
 
+### Extra Challenge and Extension Request
+- For the extra challenge, I'm not really familiar with all the annual compound calculations etc, but I think they are just implementation of mathematical calculations and nothing tricky sql is needed, so I'm comfortable skipping it.
+- Same goes with extension request, it is very open ended question so I'm assuming you can do it yourself, or skip it since it doesn't need any sql .
 
