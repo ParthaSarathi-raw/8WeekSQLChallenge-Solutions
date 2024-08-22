@@ -151,6 +151,7 @@ ORDER BY 1,2;
 
 #### Final Output
  - Only showing output for Africa Region, original table has data for all regions
+
 | region        | month_number | total_sales |
 | ------------- | ------------ | ----------- |
 | AFRICA        | 3            | 567767480   |
