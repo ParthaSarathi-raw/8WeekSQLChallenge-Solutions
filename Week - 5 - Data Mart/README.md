@@ -6,3 +6,36 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused**
+
+## Entity Relationship Diagram
+
+<img width="248" alt="image" src="https://github.com/user-attachments/assets/ba2308e4-f7bd-4e06-8ee0-13da746b041f">
+
+Well there is only a single table, but there is a lot of data cleansing to be done. Let's get to it shall we?
+
+## Data Cleansing Steps
+
+There is a lot of data cleansing required and the requirement is to do this in a single query. So I will explain how to cleanse for each column and we will combine all these to clean everything in a single query.
+
+- convert the week_date to date format : `to_date(week_date,'dd/mm/yy')`
+- add week number as 2nd column : `extract(week from to_date(week_date,'dd/mm/yy'))`
+- add month number as 3rd column : `extract(month from to_date(week_date,'dd/mm/yy'))`
+- add calender year as 4th column : `extract(year from to_date(week_date,'dd/mm/yy'))`
+- Add a new column called age_band after the original segment column using mapping mentioned in question : `case statement`
+- Add a new demographic column using the mapping mentioned in the question : `case statement`
+- Ensure all null string values with an "unknown" in segment,age_band and demographic : `case statement`
+- Generate a new avg_transaction column as the sales value divided by transactions rounded to 2 decimal places : `round(1.0*sales/transactions,2)`
+
+```` sql
+SELECT to_date(week_date,'dd/mm/yy') as week_date,
+	extract(week from to_date(week_date,'dd/mm/yy')) as week_number,
+    extract(month from to_date(week_date,'dd/mm/yy')) as month_number,
+    extract(year from to_date(week_date,'dd/mm/yy')) as calender_year,
+    region,platform,case when segment != 'null' then segment else 'unknown' end as segment,
+    case when right(segment,1) = '1' then 'Young Adults' when right(segment,1) = '2' then 'Middle Aged' when right(segment,1) in ('3','4') then 'Retirees' else 'unknown' end as age_band,
+    case when left(segment,1) = 'C' then 'Couples' when left(segment,1) = 'F' then 'Families' else 'unknown' end as demographic,
+    transactions,sales,
+    round(1.0*sales/transactions,2) as avg_transaction
+FROM data_mart.weekly_sales
+;
+````
