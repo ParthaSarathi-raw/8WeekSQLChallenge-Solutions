@@ -55,3 +55,142 @@ SELECT * FROM CTE
 - From now we will use this table as CTE and perform calculations on this base table only.
 
 ---
+
+## Data Exploration
+
+
+**1.	What day of the week is used for each week_date value?**
+
+- Simply use `to_char` function to get day name from date.
+
+#### Final Query
+```` sql
+SELECT distinct(to_char(week_date,'day')) as day_of_week FROM CTE;
+````
+#### Final Output
+ 
+| day_of_week |
+| ----------- |
+| monday      |
+
+---
+
+**2.	What range of week numbers are missing from the dataset?**
+
+- We will use `generate_series` to get week numbers 1 to 52 because in a year max weeks are 52 only.
+- On that we will filter the numbers which are not present in our data.
+
+#### Final Query
+
+````sql
+,cte2 as(SELECT GENERATE_SERIES(1,52) as week_numbers_missing) 
+SELECT week_numbers_missing FROM cte2 
+WHERE week_numbers_missing 
+NOT IN 
+(SELECT distinct week_number FROM cte);
+````
+
+#### Final Output
+
+-Only showing 10 rows output. Original table had 28 rows/week numbers which are missing
+
+| week_numbers_missing |
+| -------------------- |
+| 1                    |
+| 2                    |
+| 3                    |
+| 4                    |
+| 5                    |
+| 6                    |
+| 7                    |
+| 8                    |
+| 9                    |
+| 10                   |
+| 11                   |
+| 12                   |
+
+---
+ 
+**3.	How many total transactions were there for each year in the dataset?**
+
+- For each year : `GROUP BY caldender_year`
+- Total transactions : `sum(transactions)`
+
+#### Final Query
+
+```` sql
+SELECT calender_year,sum(transactions) as total_transactions 
+FROM CTE 
+GROUP BY calender_year
+ORDER BY 1;
+````
+
+#### Final Output
+
+| calender_year | total_transactions |
+| ------------- | ------------------ |
+| 2018          | 346406460          |
+| 2019          | 365639285          |
+| 2020          | 375813651          |
+
+---
+
+**4.	What is the total sales for each region for each month?**
+
+- Total Sales : `sum(sales)`
+- For each regoin for each month : `GROUP BY region,month`
+
+#### Final Query
+
+```` sql
+SELECT region,month_number,sum(sales) as total_sales
+FROM CTE 
+GROUP BY 1,2
+ORDER BY 1,2;
+````
+
+#### Final Output
+ - Only showing output for Africa Region, original table has data for all regions
+| region        | month_number | total_sales |
+| ------------- | ------------ | ----------- |
+| AFRICA        | 3            | 567767480   |
+| AFRICA        | 4            | 1911783504  |
+| AFRICA        | 5            | 1647244738  |
+| AFRICA        | 6            | 1767559760  |
+| AFRICA        | 7            | 1960219710  |
+| AFRICA        | 8            | 1809596890  |
+| AFRICA        | 9            | 276320987   |
+
+---
+
+**5.	What is the total count of transactions for each platform**
+
+#### Final Query
+
+#### Final Output
+ 
+**6.	What is the percentage of sales for Retail vs Shopify for each month?**
+
+#### Final Query
+
+#### Final Output
+ 
+**7.	What is the percentage of sales by demographic for each year in the dataset?**
+
+#### Final Query
+
+#### Final Output
+ 
+**8.	Which age_band and demographic values contribute the most to Retail sales?**
+
+#### Final Query
+
+#### Final Output
+ 
+**9.	Can we use the avg_transaction column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?**
+
+#### Final Query
+
+#### Final Output
+ 
+
