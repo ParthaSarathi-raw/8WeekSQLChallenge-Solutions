@@ -318,7 +318,8 @@ LIMIT 1;
 ## Before and After Analysis
 
 - One simple mistake to keep in mind is that we need the data for 4 weeks before and after 2020-06-15. So we need to do 2020-06-15 - '4 week' and 2020-06-15 +'4 week' to consider the correct dates.
-- Do not take week number for 2020-06-15 date and do -4 and + 4 to week number. It is only right when 2020-06-15 is the exact start of the week. 
+- Do not take week number for 2020-06-15 date and do -4 and + 4 to week number. It is only right when 2020-06-15 is the exact start of the week.
+- Also notice how I am going to use + 1 or - 1 day to get the correct dates.
  
 **1) What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?**
 
@@ -326,11 +327,11 @@ LIMIT 1;
 ,before_and_after_analysis AS (
     SELECT 
         SUM(CASE 
-            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '4 week'::interval AND '2020-06-15'::date - '1 day'::interval 
+            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '4 week'::interval + '1 day'::interval AND '2020-06-15'::date - '1 day'::interval 
             THEN sales 
             END) AS before_sales,
         SUM(CASE 
-            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '4 week'::interval 
+            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '4 week'::interval - '1 day'::interval
             THEN sales 
             END) AS after_sales
     FROM CTE
@@ -345,7 +346,7 @@ FROM before_and_after_analysis;
 
 | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------ | ----------- | -------------- | ------------------- |
-| 2345878357   | 2904930571  |  559052214     |  23.83              |
+| 2345878357   | 2318994169  | -26884188      | -1.15               |
 
 ---
 
@@ -355,11 +356,11 @@ FROM before_and_after_analysis;
 ,before_and_after_analysis AS (
     SELECT 
         SUM(CASE 
-            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '12 week'::interval AND '2020-06-15'::date - '1 day'::interval 
+            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '12 week'::interval + '1 day'::interval AND '2020-06-15'::date - '1 day'::interval 
             THEN sales 
             END) AS before_sales,
         SUM(CASE 
-            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '12 week'::interval 
+            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '12 week'::interval - '1 day'::interval
             THEN sales 
             END) AS after_sales
     FROM CTE
@@ -387,11 +388,11 @@ FROM before_and_after_analysis;
     SELECT
   		calender_year,
         SUM(CASE 
-            WHEN week_date BETWEEN (calender_year||'-06-15')::date - '1 day'::interval - '4 week'::interval AND (calender_year||'-06-15')::date - '1 day'::interval 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date - '1 day'::interval - '4 week'::interval + '1 day'::interval AND (calender_year||'-06-15')::date - '1 day'::interval 
             THEN sales 
             END) AS before_sales,
         SUM(CASE 
-            WHEN week_date BETWEEN (calender_year||'-06-15')::date AND (calender_year||'-06-15')::date + '4 week'::interval 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date AND (calender_year||'-06-15')::date + '4 week'::interval - '1 day'::interval
             THEN sales 
             END) AS after_sales
     FROM CTE
@@ -403,14 +404,14 @@ SELECT
     after_sales,
     after_sales - before_sales AS sales_variance,
     ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
-FROM before_and_after_analysis;
+FROM before_and_after_analysis ORDER BY 1;
 ````
 
 | calender_year | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------- | ------------ | ----------- | -------------- | ------------------- |
-| 2019          | 2249989796   | 2252326390  | 2336594        | 0.10                |
 | 2018          | 2125140809   | 2129242914  | 4102105        | 0.19                |
-| 2020          | 2345878357   | 2904930571  | 559052214      | 23.83               |
+| 2019          | 2249989796   | 2252326390  | 2336594        | 0.10                |
+| 2020          | 2345878357   | 2318994169  | -26884188      | -1.15               |
 
 ---
 
@@ -421,11 +422,11 @@ FROM before_and_after_analysis;
     SELECT
   		calender_year,
         SUM(CASE 
-            WHEN week_date BETWEEN (calender_year||'-06-15')::date - '1 day'::interval - '12 week'::interval AND (calender_year||'-06-15')::date - '1 day'::interval 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date - '1 day'::interval - '12 week'::interval + '1 day'::interval AND (calender_year||'-06-15')::date - '1 day'::interval 
             THEN sales 
             END) AS before_sales,
         SUM(CASE 
-            WHEN week_date BETWEEN (calender_year||'-06-15')::date AND (calender_year||'-06-15')::date + '12 week'::interval 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date AND (calender_year||'-06-15')::date + '12 week'::interval - '1 day'::interval
             THEN sales 
             END) AS after_sales
     FROM CTE
@@ -441,8 +442,8 @@ FROM before_and_after_analysis;
 ````
 | calender_year | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------- | ------------ | ----------- | -------------- | ------------------- |
-| 2019          | 6883386397   | 6862646103  | -20740294      | -0.30               |
 | 2018          | 6396562317   | 6500818510  | 104256193      | 1.63                |
+| 2019          | 6883386397   | 6862646103  | -20740294      | -0.30               |
 | 2020          | 7126273147   | 6973947753  | -152325394     | -2.14               |
 
 ---
@@ -465,11 +466,11 @@ Very simple question, all we have to do is `GROUP BY metric` to analyse on that 
     SELECT 
  region,
         SUM(CASE 
-            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '12 week'::interval AND '2020-06-15'::date - '1 day'::interval 
+            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '12 week'::interval + '1 day'::interval AND '2020-06-15'::date - '1 day'::interval 
             THEN sales 
             END) AS before_sales,
         SUM(CASE 
-            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '12 week'::interval 
+            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '12 week'::interval - '1 day'::interval
             THEN sales 
             END) AS after_sales
     FROM CTE GROUP BY region
@@ -483,15 +484,15 @@ region,
 FROM before_and_after_analysis
 ORDER BY 5;
 ````
-| region        | sales_variance | variance_perc |
-| ------------- | -------------- | ------------- |
-| ASIA          | -53436845      | -3.26         |
-| OCEANIA       | -71321100      | -3.03         |
-| SOUTH AMERICA | -4584174       | -2.15         |
-| CANADA        | -8174013       | -1.92         |
-| USA           | -10814843      | -1.60         |
-| AFRICA        | -9146811       | -0.54         |
-| EUROPE        | 5152392        | 4.73          |
+| region        | before_sales | after_sales | sales_variance | variance_percentage |
+| ------------- | ------------ | ----------- | -------------- | ------------------- |
+| ASIA          | 1637244466   | 1583807621  | -53436845      | -3.26               |
+| OCEANIA       | 2354116790   | 2282795690  | -71321100      | -3.03               |
+| SOUTH AMERICA | 213036207    | 208452033   | -4584174       | -2.15               |
+| CANADA        | 426438454    | 418264441   | -8174013       | -1.92               |
+| USA           | 677013558    | 666198715   | -10814843      | -1.60               |
+| AFRICA        | 1709537105   | 1700390294  | -9146811       | -0.54               |
+| EUROPE        | 108886567    | 114038959   | 5152392        | 4.73                |
 
 ---
 ### Platform Analysis
@@ -536,3 +537,6 @@ ORDER BY 5;
 
 ---
 
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+
+### Anyways Happy Fiddling with the Data. See you in the next case study.
