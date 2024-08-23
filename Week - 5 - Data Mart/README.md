@@ -316,8 +316,8 @@ LIMIT 1;
 
 ## Before and After Analysis
 
-- One simple mistake to keep in mind is that we need the data for 4 weeks before and after around 2020-06-15. So we need to do 2020-06-15 - '4 week' and 2020-06-15 +'4 week' to consider the correct dates.
-- Do not take week number for a specific date and do -4 and + 4 to week number. It is only right when 2020-06-15 is the exact start of the week. So 6/7 times when a normal date is given which is not start of week, then it will be wrong approach.
+- One simple mistake to keep in mind is that we need the data for 4 weeks before and after 2020-06-15. So we need to do 2020-06-15 - '4 week' and 2020-06-15 +'4 week' to consider the correct dates.
+- Do not take week number for 2020-06-15 date and do -4 and + 4 to week number. It is only right when 2020-06-15 is the exact start of the week. 
  
 **1) What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?**
 
@@ -445,3 +445,93 @@ FROM before_and_after_analysis;
 | 2020          | 7126273147   | 6973947753  | -152325394     | -2.14               |
 
 ---
+
+## Bonus Question
+
+**Which areas of the business have the highest negative impact in sales metrics performance in 2020 for the 12 week before and after period?**
+
+- region
+- platform
+- age_band
+- demographic
+- customer_type
+
+Very simple question, all we have to do is `GROUP BY metric` to analyse on that specific metric.
+
+### Region Analysis
+```` sql
+,before_and_after_analysis AS (
+    SELECT 
+ region,
+        SUM(CASE 
+            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '12 week'::interval AND '2020-06-15'::date - '1 day'::interval 
+            THEN sales 
+            END) AS before_sales,
+        SUM(CASE 
+            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '12 week'::interval 
+            THEN sales 
+            END) AS after_sales
+    FROM CTE GROUP BY region
+)
+SELECT 
+region,
+    before_sales,
+    after_sales,
+    after_sales - before_sales AS sales_variance,
+    ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
+FROM before_and_after_analysis
+ORDER BY 5;
+````
+| region        | sales_variance | variance_perc |
+| ------------- | -------------- | ------------- |
+| ASIA          | -53436845      | -3.26         |
+| OCEANIA       | -71321100      | -3.03         |
+| SOUTH AMERICA | -4584174       | -2.15         |
+| CANADA        | -8174013       | -1.92         |
+| USA           | -10814843      | -1.60         |
+| AFRICA        | -9146811       | -0.54         |
+| EUROPE        | 5152392        | 4.73          |
+
+---
+### Platform Analysis
+
+- I won't be showing the query for any of the following, but all we have to do is instead of region, we have to put our metric. I'll just show outputs.
+
+| platform | before_sales | after_sales | sales_variance | variance_percentage |
+| -------- | ------------ | ----------- | -------------- | ------------------- |
+| Retail   | 6906861113   | 6738777279  | -168083834     | -2.43               |
+| Shopify  | 219412034    | 235170474   | 15758440       | 7.18                |
+
+---
+
+### Age_band Analysis
+
+| age_band     | before_sales | after_sales | sales_variance | variance_percentage |
+| ------------ | ------------ | ----------- | -------------- | ------------------- |
+| unknown      | 2764354464   | 2671961443  | -92393021      | -3.34               |
+| Middle Aged  | 1164847640   | 1141853348  | -22994292      | -1.97               |
+| Retirees     | 2395264515   | 2365714994  | -29549521      | -1.23               |
+| Young Adults | 801806528    | 794417968   | -7388560       | -0.92               |
+
+---
+### Demographic Analysis
+
+| demographic | before_sales | after_sales | sales_variance | variance_percentage |
+| ----------- | ------------ | ----------- | -------------- | ------------------- |
+| unknown     | 2764354464   | 2671961443  | -92393021      | -3.34               |
+| Families    | 2328329040   | 2286009025  | -42320015      | -1.82               |
+| Couples     | 2033589643   | 2015977285  | -17612358      | -0.87               |
+
+---
+
+### Customer_type Analysis
+
+
+| customer_type | before_sales | after_sales | sales_variance | variance_percentage |
+| ------------- | ------------ | ----------- | -------------- | ------------------- |
+| Guest         | 2573436301   | 2496233635  | -77202666      | -3.00               |
+| Existing      | 3690116427   | 3606243454  | -83872973      | -2.27               |
+| New           | 862720419    | 871470664   | 8750245        | 1.01                |
+
+---
+
