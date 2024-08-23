@@ -125,6 +125,8 @@ FROM (
 
 **6) What is the percentage of visits which view the checkout page but do not have a purchase event?**
 
+- Very similar to previous question, just need to add an extra column for view checkout page.
+
 #### Final Query
 ```` sql
 SELECT 
