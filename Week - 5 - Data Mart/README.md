@@ -282,8 +282,35 @@ LIMIT 1;
 
 **9.	Can we use the avg_transaction column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?**
 
-#### Final Query
+- Let us first find the avg transaction size for each year and platform in both methods.
+- Method 1 : `avg(avg_transaction)`
+- Method 2 : `sum(transactions)/sum(sales)`
 
+#### Final Query
+```` sql
+
+    SELECT 
+        calender_year,platform
+        ,sum(sales)/sum(transactions) as overall_avg,
+        round(avg(avg_transaction)) as avg_of_avg
+    FROM CTE 
+    GROUP BY 1,2
+    ORDER BY 1,2
+;
+````
 #### Final Output
  
+| calender_year | platform | overall_avg | avg_of_avg |
+| ------------- | -------- | ----------- | ---------- |
+| 2018          | Retail   | 36          | 43         |
+| 2018          | Shopify  | 192         | 188        |
+| 2019          | Retail   | 36          | 42         |
+| 2019          | Shopify  | 183         | 178        |
+| 2020          | Retail   | 36          | 41         |
+| 2020          | Shopify  | 179         | 175        |
+
+- Again even though these values do not differ by that much, so I'd say both are fine.
+- But again depending on specific use case, one will be more accurate than other.  
+
+---
 
