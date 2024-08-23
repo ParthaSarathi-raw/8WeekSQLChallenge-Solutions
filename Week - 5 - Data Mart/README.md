@@ -317,9 +317,9 @@ LIMIT 1;
 
 ## Before and After Analysis
 
-- One simple mistake to keep in mind is that we need the data for 4 weeks before and after 2020-06-15. So we need to do 2020-06-15 - '4 week' and 2020-06-15 +'4 week' to consider the correct dates.
-- Do not take week number for 2020-06-15 date and do -4 and + 4 to week number. It is only right when 2020-06-15 is the exact start of the week.
-- Also notice how I am going to use + 1 or - 1 day to get the correct dates.
+- One simple mistake to keep in mind is that we need the data for 4 weeks before and after 2020-06-15. So we need to do - '4 week'::interval and  +'4 week'::interval to consider the correct dates.
+- Do not take week number for 2020-06-15 date and do -3 and +3 to week number. It is only right when 2020-06-15 is the exact start of the week.
+- Also notice how I am going to use + 1 or - 1 day to get the correct week range.
  
 **1) What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?**
 
