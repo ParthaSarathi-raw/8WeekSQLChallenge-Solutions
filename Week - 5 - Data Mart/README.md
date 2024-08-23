@@ -314,3 +314,134 @@ LIMIT 1;
 
 ---
 
+## Before and After Analysis
+
+- One simple mistake to keep in mind is that we need the data for 4 weeks before and after around 2020-06-15. So we need to do 2020-06-15 - '4 week' and 2020-06-15 +'4 week' to consider the correct dates.
+- Do not take week number for a specific date and do -4 and + 4 to week number. It is only right when 2020-06-15 is the exact start of the week. So 6/7 times when a normal date is given which is not start of week, then it will be wrong approach.
+ 
+**1) What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?**
+
+```` sql
+,before_and_after_analysis AS (
+    SELECT 
+        SUM(CASE 
+            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '4 week'::interval AND '2020-06-15'::date - '1 day'::interval 
+            THEN sales 
+            END) AS before_sales,
+        SUM(CASE 
+            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '4 week'::interval 
+            THEN sales 
+            END) AS after_sales
+    FROM CTE
+)
+SELECT 
+    before_sales,
+    after_sales,
+    after_sales - before_sales AS sales_variance,
+    ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
+FROM before_and_after_analysis;
+````
+
+| before_sales | after_sales | sales_variance | variance_percentage |
+| ------------ | ----------- | -------------- | ------------------- |
+| 2345878357   | 2904930571  |  559052214     |  23.83              |
+
+---
+
+**2) What about the entire 12 weeks before and after?**
+
+```` sql
+,before_and_after_analysis AS (
+    SELECT 
+        SUM(CASE 
+            WHEN week_date BETWEEN '2020-06-15'::date - '1 day'::interval - '12 week'::interval AND '2020-06-15'::date - '1 day'::interval 
+            THEN sales 
+            END) AS before_sales,
+        SUM(CASE 
+            WHEN week_date BETWEEN '2020-06-15'::date AND '2020-06-15'::date + '12 week'::interval 
+            THEN sales 
+            END) AS after_sales
+    FROM CTE
+)
+SELECT 
+    before_sales,
+    after_sales,
+    after_sales - before_sales AS sales_variance,
+    ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
+FROM before_and_after_analysis;
+````
+
+| before_sales | after_sales | sales_variance | variance_percentage |
+| ------------ | ----------- | -------------- | ------------------- |
+| 7126273147   | 6973947753  | -152325394     | -2.14               |
+
+---
+
+**3) How do the sale metrics for these 2 periods before and after compare with the previous years in 2018 and 2019?**
+
+- Checking the trend for 4 weeks before and after for each year.
+
+```` sql
+,before_and_after_analysis AS (
+    SELECT
+  		calender_year,
+        SUM(CASE 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date - '1 day'::interval - '4 week'::interval AND (calender_year||'-06-15')::date - '1 day'::interval 
+            THEN sales 
+            END) AS before_sales,
+        SUM(CASE 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date AND (calender_year||'-06-15')::date + '4 week'::interval 
+            THEN sales 
+            END) AS after_sales
+    FROM CTE
+  	GROUP BY calender_year
+)
+SELECT 
+	calender_year,
+    before_sales,
+    after_sales,
+    after_sales - before_sales AS sales_variance,
+    ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
+FROM before_and_after_analysis;
+````
+
+| calender_year | before_sales | after_sales | sales_variance | variance_percentage |
+| ------------- | ------------ | ----------- | -------------- | ------------------- |
+| 2019          | 2249989796   | 2252326390  | 2336594        | 0.10                |
+| 2018          | 2125140809   | 2129242914  | 4102105        | 0.19                |
+| 2020          | 2345878357   | 2904930571  | 559052214      | 23.83               |
+
+---
+
+- Checking the trend for 12 weeks before and after for each year.
+
+```` sql
+,before_and_after_analysis AS (
+    SELECT
+  		calender_year,
+        SUM(CASE 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date - '1 day'::interval - '12 week'::interval AND (calender_year||'-06-15')::date - '1 day'::interval 
+            THEN sales 
+            END) AS before_sales,
+        SUM(CASE 
+            WHEN week_date BETWEEN (calender_year||'-06-15')::date AND (calender_year||'-06-15')::date + '12 week'::interval 
+            THEN sales 
+            END) AS after_sales
+    FROM CTE
+  	GROUP BY calender_year
+)
+SELECT 
+	calender_year,
+    before_sales,
+    after_sales,
+    after_sales - before_sales AS sales_variance,
+    ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
+FROM before_and_after_analysis;
+````
+| calender_year | before_sales | after_sales | sales_variance | variance_percentage |
+| ------------- | ------------ | ----------- | -------------- | ------------------- |
+| 2019          | 6883386397   | 6862646103  | -20740294      | -0.30               |
+| 2018          | 6396562317   | 6500818510  | 104256193      | 1.63                |
+| 2020          | 7126273147   | 6973947753  | -152325394     | -2.14               |
+
+---
