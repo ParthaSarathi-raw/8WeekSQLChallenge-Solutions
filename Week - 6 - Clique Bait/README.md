@@ -157,22 +157,88 @@ FROM (
  
 **7) What are the top 3 pages by number of views?**
 
-#### Final Query
+- We need page name, so join tables on `page_id` and perform `GROUP BY page_name`
+- We need to only consider page views : `WHERE event_type = 1`
+- No. of times it has been viewed : `count(*)`
+- Top 3 pages : `LIMIT 3`
 
+#### Final Query
+```` sql
+SELECT page_name,count(*) as views 
+FROM clique_bait.events e 
+JOIN clique_bait.page_hierarchy h 
+ON e.page_id = h.page_id 
+WHERE event_type = 1
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 3;
+````
 #### Output Table
  
+| page_name    | views |
+| ------------ | ----- |
+| All Products | 3174  |
+| Checkout     | 2103  |
+| Home Page    | 1782  |
+
+---
+
 **8) What is the number of views and cart adds for each product category?**
 
+- For each product category : `GROUP BY product_category`
+- No. of views and cart adds : `SUM(CASE)`
+
 #### Final Query
+```` sql
+SELECT product_category,
+	   sum(case when event_type = 1 then 1 end) as views,
+       sum(case when event_type = 2 then 1 end) as added_to_cart
+FROM clique_bait.events e 
+JOIN clique_bait.page_hierarchy h 
+ON e.page_id = h.page_id 
+WHERE product_category is not null
+GROUP BY 1;
+````
 
 #### Output Table
- 
+
+| product_category | views | added_to_cart |
+| ---------------- | ----- | ------------- |
+| Luxury           | 3032  | 1870          |
+| Shellfish        | 6204  | 3792          |
+| Fish             | 4633  | 2789          |
+
+---
+
 **9) What are the top 3 products by purchases?**
 
-#### Final Query
+- We need to have only those visit ids where purchases have happened.
+- On those visit ids we will see which pages had most added to carts. These are already purchased.
 
+**Note : This approach only works because in the data, there is only 1 purchase per each visit and that is the event_type which is last for that specific visit_id. So there is no case where, after some purchase something else was added to cart.**
+
+#### Final Query
+```` sql
+SELECT page_name,count(*) as purchased_times
+FROM clique_bait.events e 
+JOIN clique_bait.page_hierarchy h 
+ON e.page_id = h.page_id 
+WHERE visit_id IN (SELECT visit_id FROM clique_bait.events WHERE event_type = 3) 
+AND event_type = 2
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 3;
+````
 #### Output Table
  
+| page_name | purchased_times |
+| --------- | --------------- |
+| Lobster   | 754             |
+| Oyster    | 726             |
+| Crab      | 719             |
+
+---
+
 
 ## Product Funnel Analysis
 
