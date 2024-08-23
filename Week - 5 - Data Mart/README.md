@@ -33,7 +33,7 @@ WITH CTE as (SELECT to_date(week_date,'dd/mm/yy') as week_date,
 	extract(week from to_date(week_date,'dd/mm/yy')) as week_number,
     extract(month from to_date(week_date,'dd/mm/yy')) as month_number,
     extract(year from to_date(week_date,'dd/mm/yy')) as calender_year,
-    region,platform,case when segment != 'null' then segment else 'unknown' end as segment,
+    region,platform,customer_type,case when segment != 'null' then segment else 'unknown' end as segment,
     case when right(segment,1) = '1' then 'Young Adults' when right(segment,1) = '2' then 'Middle Aged' when right(segment,1) in ('3','4') then 'Retirees' else 'unknown' end as age_band,
     case when left(segment,1) = 'C' then 'Couples' when left(segment,1) = 'F' then 'Families' else 'unknown' end as demographic,
     transactions,sales,
@@ -44,13 +44,14 @@ SELECT * FROM CTE
 ````
 #### Final Output
 
-| week_date                | week_number | month_number | calender_year | region        | platform | segment | age_band     | demographic | transactions | sales    | avg_transaction |
-| ------------------------ | ----------- | ------------ | ------------- | ------------- | -------- | ------- | ------------ | ----------- | ------------ | -------- | --------------- |
-| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | ASIA          | Retail   | C3      | Retirees     | Couples     | 120631       | 3656163  | 30.31           |
-| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | ASIA          | Retail   | F1      | Young Adults | Families    | 31574        | 996575   | 31.56           |
-| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | USA           | Retail   | unknown | unknown      | unknown     | 529151       | 16509610 | 31.20           |
-| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | EUROPE        | Retail   | C1      | Young Adults | Couples     | 4517         | 141942   | 31.42           |
-| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | AFRICA        | Retail   | C2      | Middle Aged  | Couples     | 58046        | 1758388  | 30.29           |
+| week_date                | week_number | month_number | calender_year | region        | platform | customer_type | segment | age_band     | demographic | transactions | sales    | avg_transaction |
+| ------------------------ | ----------- | ------------ | ------------- | ------------- | -------- | ------------- | ------- | ------------ | ----------- | ------------ | -------- | --------------- |
+| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | ASIA          | Retail   | New           | C3      | Retirees     | Couples     | 120631       | 3656163  | 30.31           |
+| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | ASIA          | Retail   | New           | F1      | Young Adults | Families    | 31574        | 996575   | 31.56           |
+| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | USA           | Retail   | Guest         | unknown | unknown      | unknown     | 529151       | 16509610 | 31.20           |
+| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | EUROPE        | Retail   | New           | C1      | Young Adults | Couples     | 4517         | 141942   | 31.42           |
+| 2020-08-31T00:00:00.000Z | 36          | 8            | 2020          | AFRICA        | Retail   | New           | C2      | Middle Aged  | Couples     | 58046        | 1758388  | 30.29           |
+
 
 - From now we will use this table as CTE and perform calculations on this base table only.
 
