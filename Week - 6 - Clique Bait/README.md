@@ -96,16 +96,62 @@ SELECT event_type,count(*) as no_of_events FROM clique_bait.events GROUP BY 1 OR
 
 ---
 **5) What is the percentage of visits which have a purchase event?**
-
+- This can also be solved using WHERE condition and doing a subquery in the denominator to find unique visit ids as well. 
 #### Final Query
-
+```` sql
+SELECT 
+    ROUND(100.0 * SUM(CASE WHEN no_of_purchases > 0 THEN 1 ELSE 0 END) / COUNT(*), 2)
+FROM (
+    SELECT 
+        visit_id,
+        SUM(CASE WHEN event_name = 'Purchase' THEN 1 ELSE 0 END) AS no_of_purchases
+    FROM 
+        clique_bait.events e
+    JOIN 
+        clique_bait.event_identifier i 
+    ON 
+        e.event_type = i.event_type
+    GROUP BY 
+        visit_id
+) temp;
+````
 #### Output Table
- 
+
+| round |
+| ----- |
+| 49.86 |
+
+---
+
 **6) What is the percentage of visits which view the checkout page but do not have a purchase event?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    round(100.0*sum(case when no_of_views_for_checkout > 0 and no_of_purchases = 0 then 1 else 0 end)/count(*),2) as perc_of_visits
+FROM (
+    SELECT 
+        visit_id,
+        SUM(CASE WHEN event_name = 'Purchase' THEN 1 ELSE 0 END) AS no_of_purchases,
+  		SUM(CASE WHEN event_name = 'Page View' and page_id = 12 then 1 else 0 end) as no_of_views_for_checkout
+    FROM 
+        clique_bait.events e
+    JOIN 
+        clique_bait.event_identifier i 
+    ON 
+        e.event_type = i.event_type
+    GROUP BY 
+        visit_id
+) temp;
+````
 #### Output Table
+
+| perc_of_visits |
+| -------------- |
+| 9.15           |
+
+---
+
  
 **7) What are the top 3 pages by number of views?**
 
