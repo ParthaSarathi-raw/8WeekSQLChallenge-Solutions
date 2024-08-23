@@ -11,28 +11,90 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 
 **1) How many users are there?**
 
-#### Final Query
+- no. of users : `count(distinct user_id)`
 
+#### Final Query
+```` sql
+SELECT count(distinct user_id) as no_of_users FROM clique_bait.users ;
+````
 #### Output Table
  
+| no_of_users |
+| ----------- |
+| 500         |
+
+---
+
 **2) How many cookies does each user have on average?**
 
-#### Final Query
+- For each user we will first count the no. of unique cookies. And on that we will do avg.
 
+#### Final Query
+```` sql
+SELECT ROUND(AVG(no_of_cookies), 2) AS avg_no_of_cookies_per_user
+FROM (
+    SELECT user_id, COUNT(DISTINCT cookie_id) AS no_of_cookies
+    FROM clique_bait.users
+    GROUP BY user_id
+) temp;
+````
 #### Output Table
- 
+
+| avg_no_of_cookies_per_user |
+| -------------------------- |
+| 3.56                       |
+
+---
+
 **3) What is the unique number of visits by all users per month?**
 
-#### Final Query
+- Per Month : `GROUP BY month`
+- Unique number of visits : `count(distinct visit_id)`
 
+#### Final Query
+```` sql
+SELECT 
+    EXTRACT(MONTH FROM event_time) AS month,
+    COUNT(DISTINCT visit_id) AS no_of_visits
+FROM 
+    clique_bait.events
+GROUP BY 
+    1
+ORDER BY 
+    1;
+````
 #### Output Table
- 
+
+| month | no_of_visits |
+| ----- | ------------ |
+| 1     | 876          |
+| 2     | 1488         |
+| 3     | 916          |
+| 4     | 248          |
+| 5     | 36           |
+
+---
+
 **4) What is the number of events for each event type?**
 
-#### Final Query
+- For each event type : `GROUP BY event_type`
+- no. of events : `count(*)`
 
+#### Final Query
+```` sql
+SELECT event_type,count(*) as no_of_events FROM clique_bait.events GROUP BY 1 ORDER By 1;
+````
 #### Output Table
- 
+
+ | event_type | no_of_events |
+| ---------- | ------------ |
+| 1          | 20928        |
+| 2          | 8451         |
+| 3          | 1777         |
+| 4          | 876          |
+| 5          | 702          |
+
+---
 **5) What is the percentage of visits which have a purchase event?**
 
 #### Final Query
