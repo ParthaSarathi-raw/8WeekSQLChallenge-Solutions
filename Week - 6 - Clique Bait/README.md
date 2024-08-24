@@ -438,7 +438,7 @@ FROM
 •	campaign_name: map the visit to a campaign if the visit_start_time falls between the start_date and end_date \
 •	impression: count of ad impressions for each visit \
 •	click: count of ad clicks for each visit \
-•	(Optional column) cart_products: a comma separated text value with products added to the cart sorted by the order they were added to the cart (hint: use the sequence_number) \
+•	(Optional column) cart_products: a comma separated text value with products added to the cart sorted by the order they were added to the cart (hint: use the sequence_number) 
 
 #### Final Query 
 
