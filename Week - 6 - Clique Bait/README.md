@@ -328,6 +328,7 @@ SELECT * FROM product_category_details;
 ---
 
 **Use your 2 new output tables - answer the following questions:**
+<br>
 **1) Which product had the most views, cart adds and purchases?**
 
 #### Final Query
