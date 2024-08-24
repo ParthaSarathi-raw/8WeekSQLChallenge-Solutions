@@ -493,4 +493,170 @@ SELECT * FROM campaign_analysis;
 | 2       | 49d73d   | 2020-02-16T06:21:27.138Z | 11         | 9         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Salmon, Kingfish, Tuna, Russian Caviar, Black Truffle, Abalone, Lobster, Crab, Oyster |
 | 2       | 0635fb   | 2020-02-16T06:42:42.735Z | 9          | 4         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Salmon, Kingfish, Abalone, Crab                                                       | 
 
+--- 
 
+**Identifying users who have received impressions during each campaign period and comparing each metric with other users who did not have an impression event**
+
+- First step is to find the no. of campaigns for each user that had impression on the user.
+
+```` sql
+,impression_count as (
+SELECT 
+    user_id,
+    SUM(CASE WHEN campaign_name IS NOT NULL THEN 1 ELSE 0 END) AS campaigns_impressioned
+FROM (
+    SELECT 
+        user_id, 
+        campaign_name 
+    FROM 
+        campaign_analysis 
+    WHERE 
+        impression = 1 
+    GROUP BY 
+        user_id, campaign_name 
+    ORDER BY 
+        1
+) temp
+GROUP BY 
+    user_id 
+ORDER BY 
+    user_id)
+SELECT * FROM impression_count;
+````
+- Showing first 10 rows only. Original data has 500 users data.
+
+| user_id | campaigns_impressioned |
+| ------- | ---------------------- |
+| 1       | 1                      |
+| 2       | 2                      |
+| 3       | 0                      |
+| 4       | 1                      |
+| 5       | 1                      |
+| 6       | 1                      |
+| 7       | 1                      |
+| 8       | 1                      |
+| 9       | 1                      |
+| 10      | 2                      |
+
+- Now all we gotta do is join the above table with `campaign_analysis` and see how each metric is doing for users with 3 impressions and users with no impressions in any campaign.
+
+#### Final Query
+
+```` sql
+SELECT 
+    campaigns_impressioned,
+    ROUND(AVG(page_views), 2) AS avg_page_views,
+    ROUND(AVG(cart_adds), 2) AS avg_cart_adds,
+    ROUND(100.0 * AVG(purchase), 2) AS purchase_percentage
+FROM 
+    impression_count c 
+JOIN 
+    campaign_analysis a ON c.user_id = a.user_id
+WHERE 
+    campaigns_impressioned IN (0, 3)
+GROUP BY 
+    1 
+ORDER BY 
+    1;
+````
+
+#### Output Table
+
+| campaigns_impressioned | avg_page_views | avg_cart_adds | purchase_percentage |
+| ---------------------- | -------------- | ------------- | ------------------- |
+| 0                      | 5.45           | 2.02          | 45.08               |
+| 3                      | 7.48           | 3.23          | 62.50               |
+
+- I'm here to do the sql part, I will leave the insights up to you.
+
+---
+
+
+
+
+- Does clicking on an impression lead to higher purchase rates?
+
+
+#### Final Query 
+
+```` sql
+SELECT 
+    click,
+    ROUND(100.0 * AVG(purchase), 2) AS purchase_percentage
+FROM 
+    campaign_analysis
+GROUP BY 
+    1;
+````
+
+#### Output Table
+
+| click | purchase_percentage |
+| ----- | ------------------- |
+| 0     | 40.29               |
+| 1     | 88.89               |
+
+---
+
+
+- What is the uplift in purchase rate when comparing users who click on a campaign impression versus users who do not receive an impression? What if we compare them with users who just an impression but do not click?
+
+#### Final Query 
+
+```` sql
+SELECT 
+    impression,
+    click,
+    ROUND(100.0 * AVG(purchase), 2) AS purchase_percentage
+FROM 
+    campaign_analysis
+GROUP BY 
+    1, 2
+ORDER BY 
+    1, 2;
+````
+#### Output Table
+
+| impression | click | purchase_percentage |
+| ---------- | ----- | ------------------- |
+| 0          | 0     | 38.69               |
+| 1          | 0     | 64.94               |
+| 1          | 1     | 88.89               |
+
+---
+
+
+- What metrics can you use to quantify the success or failure of each campaign compared to eachother?
+
+#### Final Query
+
+```` sql
+SELECT 
+    campaign_name,
+    SUM(impression) AS no_of_impressions,
+    SUM(click) AS no_of_clicks,
+    ROUND(100.0 * SUM(click) / SUM(impression), 2) AS click_percentage
+FROM 
+    campaign_analysis
+WHERE 
+    impression > 0 
+    AND campaign_name IS NOT NULL
+GROUP BY 
+    campaign_name;
+````
+#### Output Table
+
+| campaign_name                     | no_of_impressions | no_of_clicks | click_percentage |
+| --------------------------------- | ----------------- | ------------ | ---------------- |
+| 25% Off - Living The Lux Life     | 114               | 88           | 77.19            |
+| BOGOF - Fishing For Compliments   | 74                | 64           | 86.49            |
+| Half Off - Treat Your Shellf(ish) | 585               | 469          | 80.17            |
+
+- Why are there impressions and clicks when campaign_name is null? Maybe that data is for 3rd party ads. Unless I am making a really stupid mistake, there are impressions and clicks going on even when no campaign is going on. I cross check it for one visit id . Let me know if you think I've made a mistake somewhere.
+
+---
+
+
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+
+### Anyways Happy Fiddling with the Data. See you in the next case study.
