@@ -251,7 +251,7 @@ How many times was each product purchased?**
 #### Final Query
 
 ```` sql
-CREATE TABLE product_details AS (
+WITH product_details AS (
     SELECT 
         page_name,
         SUM(CASE WHEN event_type = 1 THEN 1 ELSE 0 END) AS views,
@@ -269,8 +269,9 @@ CREATE TABLE product_details AS (
         e.page_id NOT IN (1, 2, 12, 13) 
     GROUP BY 
         page_name
-);
+)
 SELECT * FROM product_details;
+
 ````
 
 #### Output Table
@@ -292,39 +293,131 @@ SELECT * FROM product_details;
 **Additionally, create another table which further aggregates the data for the above points but this time for each product category instead of individual products.**
 
 #### Final Query
-
+```` sql
+WITH product_category_details AS (
+    SELECT 
+        product_category,
+        SUM(CASE WHEN event_type = 1 THEN 1 ELSE 0 END) AS views,
+        SUM(CASE WHEN event_type = 2 THEN 1 ELSE 0 END) AS added_to_cart,
+        SUM(CASE WHEN event_type = 2 AND temp.visit_id IS NULL THEN 1 ELSE 0 END) AS abandoned,
+        SUM(CASE WHEN event_type = 2 AND temp.visit_id IS NOT NULL THEN 1 ELSE 0 END) AS purchased
+    FROM 
+        clique_bait.events e 
+    JOIN 
+        clique_bait.page_hierarchy h ON e.page_id = h.page_id 
+    LEFT JOIN 
+        (SELECT visit_id FROM clique_bait.events WHERE event_type = 3) temp 
+        ON e.visit_id = temp.visit_id 
+    WHERE 
+        product_category is not null 
+    GROUP BY 
+        product_category
+)
+SELECT * FROM product_category_details;
+````
 #### Output Table
- 
+
+| product_category | views | added_to_cart | abandoned | purchased |
+| ---------------- | ----- | ------------- | --------- | --------- |
+| Luxury           | 3032  | 1870          | 466       | 1404      |
+| Shellfish        | 6204  | 3792          | 894       | 2898      |
+| Fish             | 4633  | 2789          | 674       | 2115      |
+
+---
+
 **Use your 2 new output tables - answer the following questions:**
 **1) Which product had the most views, cart adds and purchases?**
 
 #### Final Query
+```` sql
+SELECT 
+    (SELECT page_name FROM product_details ORDER BY views DESC LIMIT 1) AS most_viewed,
+    (SELECT page_name FROM product_details ORDER BY added_to_cart DESC LIMIT 1) AS most_added_to_cart,
+    (SELECT page_name FROM product_details ORDER BY purchased DESC LIMIT 1) AS most_purchased;
+````
 
 #### Output Table
- 
+
+| most_viewed | most_added_to_cart | most_purchased |
+| ----------- | ------------------ | -------------- |
+| Oyster      | Lobster            | Lobster        |
+
+---
+
 **2) Which product was most likely to be abandoned?**
 
 #### Final Query
+```` sql
+SELECT 
+    (SELECT page_name FROM product_details ORDER BY abandoned DESC LIMIT 1) AS most_likely_to_be_abandoned;
+````
 
 #### Output Table
- 
+
+| most_likely_to_be_abandoned |
+| --------------------------- |
+| Russian Caviar              |
+
+---
+
 **3) Which product had the highest view to purchase percentage?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    page_name AS highest_view_to_purchase_percentage 
+FROM 
+    product_details 
+ORDER BY 
+    1.0 * purchased / views DESC 
+LIMIT 1;
+````
 #### Output Table
+
+
+| highest_view_to_purchase_percentage |
+| ----------------------------------- |
+| Lobster                             |
+
+---
+
  
 **4) What is the average conversion rate from view to cart add?**
 
 #### Final Query
+```` sql
+SELECT 
+    ROUND(AVG(100.0 * added_to_cart / views), 2) AS avg_conversion_rate_from_view_to_cart 
+FROM 
+    product_details;
+````
 
 #### Output Table
+
+
+| avg_conversion_rate_from_view_to_cart |
+| ------------------------------------- |
+| 60.95                                 |
+
+---
+
  
 **5) What is the average conversion rate from cart add to purchase?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    ROUND(AVG(100.0 * purchased / added_to_cart), 2) AS avg_conversion_rate_from_cart_to_purchased 
+FROM 
+    product_details;
+````
 #### Output Table
- 
+
+| avg_conversion_rate_from_cart_to_purchased |
+| ------------------------------------------ |
+| 75.93                                      |
+
+---
+
 
 ## Campaigns Analysis
