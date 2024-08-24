@@ -242,11 +242,13 @@ LIMIT 3;
 
 ## Product Funnel Analysis
 
-**Using a single SQL query - create a new output table which has the following details:
-How many times was each product viewed?
-How many times was each product added to cart?
-How many times was each product added to a cart but not purchased (abandoned)?
+**Using a single SQL query - create a new output table which has the following details: \
+How many times was each product viewed? \
+How many times was each product added to cart? \
+How many times was each product added to a cart but not purchased (abandoned)? \
 How many times was each product purchased?**
+
+- Notice how we are using left join to determine weather a particular product/visit_id has done purchase or not.
 
 #### Final Query
 
