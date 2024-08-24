@@ -250,8 +250,45 @@ How many times was each product purchased?**
 
 #### Final Query
 
+```` sql
+CREATE TABLE product_details AS (
+    SELECT 
+        page_name,
+        SUM(CASE WHEN event_type = 1 THEN 1 ELSE 0 END) AS views,
+        SUM(CASE WHEN event_type = 2 THEN 1 ELSE 0 END) AS added_to_cart,
+        SUM(CASE WHEN event_type = 2 AND temp.visit_id IS NULL THEN 1 ELSE 0 END) AS abandoned,
+        SUM(CASE WHEN event_type = 2 AND temp.visit_id IS NOT NULL THEN 1 ELSE 0 END) AS purchased
+    FROM 
+        clique_bait.events e 
+    JOIN 
+        clique_bait.page_hierarchy h ON e.page_id = h.page_id 
+    LEFT JOIN 
+        (SELECT visit_id FROM clique_bait.events WHERE event_type = 3) temp 
+        ON e.visit_id = temp.visit_id 
+    WHERE 
+        e.page_id NOT IN (1, 2, 12, 13) 
+    GROUP BY 
+        page_name
+);
+SELECT * FROM product_details;
+````
+
 #### Output Table
- 
+
+| page_name      | views | added_to_cart | abandoned | purchased |
+| -------------- | ----- | ------------- | --------- | --------- |
+| Abalone        | 1525  | 932           | 233       | 699       |
+| Oyster         | 1568  | 943           | 217       | 726       |
+| Salmon         | 1559  | 938           | 227       | 711       |
+| Crab           | 1564  | 949           | 230       | 719       |
+| Tuna           | 1515  | 931           | 234       | 697       |
+| Lobster        | 1547  | 968           | 214       | 754       |
+| Kingfish       | 1559  | 920           | 213       | 707       |
+| Russian Caviar | 1563  | 946           | 249       | 697       |
+| Black Truffle  | 1469  | 924           | 217       | 707       |
+
+---
+
 **Additionally, create another table which further aggregates the data for the above points but this time for each product category instead of individual products.**
 
 #### Final Query
