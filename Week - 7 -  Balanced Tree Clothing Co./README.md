@@ -229,63 +229,298 @@ GROUP BY member;
 **1) What are the top 3 products by total revenue before discount?**
 
 #### Final Query
-
+```` sql
+SELECT product_name as top_3_products
+FROM CTE
+GROUP BY 1
+ORDER BY sum((1-0.01*discount)* qty * price) DESC
+LIMIT 3;
+````
 #### Output Table
- 
+
+| top_3_products               |
+| ---------------------------- |
+| Blue Polo Shirt - Mens       |
+| Grey Fashion Jacket - Womens |
+| White Tee Shirt - Mens       |
+
+---
+
 **2) What is the total quantity, revenue and discount for each segment?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    segment_name,
+    SUM(qty) AS total_quantity,
+    SUM((1 - 0.01 * discount) * qty * price) AS total_revenue,
+    SUM(0.01 * discount * qty * price) AS total_discount
+FROM 
+    CTE
+GROUP BY 
+    segment_name;
+````
 #### Output Table
- 
+
+| segment_name | total_quantity | total_revenue | total_discount |
+| ------------ | -------------- | ------------- | -------------- |
+| Shirt        | 11265          | 356548.73     | 49594.27       |
+| Jeans        | 11349          | 183006.03     | 25343.97       |
+| Jacket       | 11385          | 322705.54     | 44277.46       |
+| Socks        | 11217          | 270963.56     | 37013.44       |
+
+---
+
 **3) What is the top selling product for each segment?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    segment_name,
+    product_name AS top_product
+FROM (
+    SELECT 
+        segment_name,
+        product_name,
+        DENSE_RANK() OVER (
+            PARTITION BY segment_name
+            ORDER BY SUM(qty) DESC
+        ) AS dn
+    FROM 
+        CTE
+    GROUP BY 
+        segment_name,
+        product_name
+) temp
+WHERE 
+    dn = 1;
+````
 #### Output Table
- 
+
+| segment_name | top_product                   |
+| ------------ | ----------------------------- |
+| Jacket       | Grey Fashion Jacket - Womens  |
+| Jeans        | Navy Oversized Jeans - Womens |
+| Shirt        | Blue Polo Shirt - Mens        |
+| Socks        | Navy Solid Socks - Mens       |
+
+---
+
 **4) What is the total quantity, revenue and discount for each category?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    category_name,
+    SUM(qty) AS total_quantity,
+    SUM((1 - 0.01 * discount) * qty * price) AS total_revenue,
+    SUM(0.01 * discount * qty * price) AS total_discount
+FROM 
+    CTE
+GROUP BY 
+    category_name;
+````
 #### Output Table
- 
+
+| category_name | total_quantity | total_revenue | total_discount |
+| ------------- | -------------- | ------------- | -------------- |
+| Mens          | 22482          | 627512.29     | 86607.71       |
+| Womens        | 22734          | 505711.57     | 69621.43       |
+
+---
+
 **5) What is the top selling product for each category?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    category_name,
+    product_name AS top_product
+FROM (
+    SELECT 
+        category_name,
+        product_name,
+        DENSE_RANK() OVER (
+            PARTITION BY category_name
+            ORDER BY SUM(qty) DESC
+        ) AS dn
+    FROM 
+        CTE
+    GROUP BY 
+        category_name,
+        product_name
+) temp
+WHERE 
+    dn = 1;
+````
 #### Output Table
- 
+
+| category_name | top_product                  |
+| ------------- | ---------------------------- |
+| Mens          | Blue Polo Shirt - Mens       |
+| Womens        | Grey Fashion Jacket - Womens |
+
+---
+
 **6) What is the percentage split of revenue by product for each segment?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    segment_name,
+    product_name,
+    ROUND(
+        100.0 * revenue / SUM(revenue) OVER (PARTITION BY segment_name),
+        2
+    ) AS percentage_split_of_revenue
+FROM (
+    SELECT 
+        segment_name,
+        product_name,
+        SUM((1 - 0.01 * discount) * qty * price) AS revenue
+    FROM 
+        CTE
+    GROUP BY 
+        segment_name,
+        product_name
+) temp;
+````
 #### Output Table
- 
+
+| segment_name | product_name                     | percentage_split_of_revenue |
+| ------------ | -------------------------------- | --------------------------- |
+| Jacket       | Indigo Rain Jacket - Womens      | 19.44                       |
+| Jacket       | Khaki Suit Jacket - Womens       | 23.57                       |
+| Jacket       | Grey Fashion Jacket - Womens     | 56.99                       |
+| Jeans        | Navy Oversized Jeans - Womens    | 24.04                       |
+| Jeans        | Black Straight Jeans - Womens    | 58.14                       |
+| Jeans        | Cream Relaxed Jeans - Womens     | 17.82                       |
+| Shirt        | White Tee Shirt - Mens           | 37.48                       |
+| Shirt        | Blue Polo Shirt - Mens           | 53.53                       |
+| Shirt        | Teal Button Up Shirt - Mens      | 8.99                        |
+| Socks        | Navy Solid Socks - Mens          | 44.24                       |
+| Socks        | White Striped Socks - Mens       | 20.20                       |
+| Socks        | Pink Fluro Polkadot Socks - Mens | 35.57                       |
+
+---
+
 **7) What is the percentage split of revenue by segment for each category?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    category_name,
+    segment_name,
+    ROUND(
+        100.0 * revenue / SUM(revenue) OVER (PARTITION BY category_name),
+        2
+    ) AS percentage_split_of_revenue
+FROM (
+    SELECT 
+        category_name,
+        segment_name,
+        SUM((1 - 0.01 * discount) * qty * price) AS revenue
+    FROM 
+        CTE
+    GROUP BY 
+        1,
+        2
+) temp;
+````
 #### Output Table
- 
+
+| category_name | segment_name | percentage_split_of_revenue |
+| ------------- | ------------ | --------------------------- |
+| Mens          | Socks        | 43.18                       |
+| Mens          | Shirt        | 56.82                       |
+| Womens        | Jeans        | 36.19                       |
+| Womens        | Jacket       | 63.81                       |
+
+---
+
 **8) What is the percentage split of total revenue by category?**
 
 #### Final Query
-
+```` sql
+SELECT 
+    category_name,
+    ROUND(
+        100.0 * revenue / SUM(revenue) OVER (),
+        2
+    ) AS percentage_split_of_revenue
+FROM (
+    SELECT 
+        category_name,
+        SUM((1 - 0.01 * discount) * qty * price) AS revenue
+    FROM 
+        CTE
+    GROUP BY 
+        1
+) temp;
+````
 #### Output Table
- 
+
+| category_name | percentage_split_of_revenue |
+| ------------- | --------------------------- |
+| Mens          | 55.37                       |
+| Womens        | 44.63                       |
+
+---
+
 **9) What is the total transaction “penetration” for each product? (hint: penetration = number of transactions where at least 1 quantity of a product was purchased divided by total number of transactions)**
 
 #### Final Query
-
+```` sql
+SELECT 
+    product_name,
+    ROUND(
+        100.0 * COUNT(*) / (SELECT COUNT(DISTINCT txn_id) FROM CTE), 
+        2
+    ) AS penetration_perc
+FROM 
+    CTE
+GROUP BY 
+    product_name;
+````
 #### Output Table
- 
+
+| product_name                     | penetration_perc |
+| -------------------------------- | ---------------- |
+| White Tee Shirt - Mens           | 50.72            |
+| Navy Solid Socks - Mens          | 51.24            |
+| Grey Fashion Jacket - Womens     | 51.00            |
+| Navy Oversized Jeans - Womens    | 50.96            |
+| Pink Fluro Polkadot Socks - Mens | 50.32            |
+| Khaki Suit Jacket - Womens       | 49.88            |
+| Black Straight Jeans - Womens    | 49.84            |
+| White Striped Socks - Mens       | 49.72            |
+| Blue Polo Shirt - Mens           | 50.72            |
+| Indigo Rain Jacket - Womens      | 50.00            |
+| Cream Relaxed Jeans - Womens     | 49.72            |
+| Teal Button Up Shirt - Mens      | 49.68            |
+
+---
+
+
 **10) What is the most common combination of at least 1 quantity of any 3 products in a 1 single transaction?**
 
 #### Final Query
-
+```` sql
+SELECT a.product_name,b.product_name,c.product_name FROM CTE a
+JOIN CTE b on a.txn_id = b.txn_id and a.prod_id < b.prod_id 
+JOIN CTE c on a.txn_id = c.txn_id and b.prod_id < c.prod_id 
+GROUP BY 1,2,3 
+ORDER BY count(*) DESC
+LIMIT 1;
+````
 #### Output Table
  
+
+| product_name           | product_name                 | product_name                |
+| ---------------------- | ---------------------------- | --------------------------- |
+| White Tee Shirt - Mens | Grey Fashion Jacket - Womens | Teal Button Up Shirt - Mens |
+
+---
 
  ## Reporting Challenge
 
