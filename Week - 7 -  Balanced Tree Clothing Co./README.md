@@ -80,7 +80,6 @@ SELECT sum(qty*price) as total_revenue FROM CTE;
  
 **3) What was the total discount amount for all products?**
 
-- Keep in mind that discount is given after purchasing all the products, so we should not calculate discount from direct price itself. We need to first do `price*qty` and then apply discount
 
 #### Final Query
 ```` sql
