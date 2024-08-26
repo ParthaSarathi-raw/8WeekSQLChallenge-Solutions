@@ -524,5 +524,173 @@ LIMIT 1;
 
  ## Reporting Challenge
 
+**Write a single SQL script that combines all of the previous questions into a scheduled report that the Balanced Tree team can run at the beginning of each month to calculate the previous month’s values.**
+
+<br>
+
+**He first wants you to generate the data for January only - but then he also wants you to demonstrate that you can easily run the samne analysis for February without many changes (if at all).**
+
+<br>
+
+**Feel free to split up your final outputs into as many tables as you need**
+
+- Even though danny did mention split final output into as many tables as you need, try to stick to the least amount of tables at which you can cover all questions.
+- Again this is not something very complicated, I'm just going to show you 1 output table. You can create table for other questions if you'd like.
+
+#### Final Query
+```` sql
+SELECT 
+    category_name,
+    segment_name,
+    product_name,
+    SUM(qty) AS total_quantity,
+    SUM(qty * price * (1 - 0.01 * discount)) AS total_revenue,
+    SUM(qty * price * 0.01 * discount) AS total_discount,
+    ROUND(
+        100.0 * SUM(qty * price * (1 - 0.01 * discount)) / 
+        SUM(SUM(qty * price * (1 - 0.01 * discount))) OVER (), 
+        2
+    ) AS revenue_perc,
+    ROUND(
+        100.0 * SUM(CASE WHEN member = 't' THEN 1 ELSE 0 END) / 
+        COUNT(txn_id), 
+        2
+    ) AS members_perc_txns,
+    ROUND(
+        100.0 * SUM(CASE WHEN member = 'f' THEN 1 ELSE 0 END) / 
+        COUNT(txn_id), 
+        2
+    ) AS nonmembers_perc_txns,
+    ROUND(
+        AVG(CASE WHEN member = 't' THEN qty * price * (1 - 0.01 * discount) END), 
+        2
+    ) AS avg_members_revenue,
+    ROUND(
+        AVG(CASE WHEN member = 'f' THEN qty * price * (1 - 0.01 * discount) END), 
+        2
+    ) AS avg_nonmembers_revenue
+FROM 
+    cte
+WHERE 
+    EXTRACT(MONTH FROM start_txn_time) = 2
+GROUP BY 
+    category_name, 
+    segment_name, 
+    product_name
+ORDER BY 
+    category_name, 
+    segment_name, 
+    total_revenue;
+````
+
+#### Output Table
+
+| category_name | segment_name | product_name                     | total_quantity | total_revenue | total_discount | revenue_perc | members_perc_txns | nonmembers_perc_txns | avg_members_revenue | avg_nonmembers_revenue |
+| ------------- | ------------ | -------------------------------- | -------------- | ------------- | -------------- | ------------ | ----------------- | -------------------- | ------------------- | ---------------------- |
+| Mens          | Shirt        | Teal Button Up Shirt - Mens      | 1205           | 10589.40      | 1460.60        | 2.86         | 60.57             | 39.43                | 25.22               | 25.06                  |
+| Mens          | Shirt        | White Tee Shirt - Mens           | 1198           | 42074.00      | 5846.00        | 11.37        | 60.76             | 39.24                | 106.91              | 105.91                 |
+| Mens          | Shirt        | Blue Polo Shirt - Mens           | 1281           | 64048.62      | 8968.38        | 17.32        | 62.77             | 37.23                | 153.46              | 151.84                 |
+| Mens          | Socks        | White Striped Socks - Mens       | 1252           | 18763.75      | 2520.25        | 5.07         | 62.68             | 37.32                | 44.42               | 45.68                  |
+| Mens          | Socks        | Pink Fluro Polkadot Socks - Mens | 1246           | 31833.30      | 4300.70        | 8.61         | 62.75             | 37.25                | 80.72               | 73.47                  |
+| Mens          | Socks        | Navy Solid Socks - Mens          | 1190           | 37583.64      | 5256.36        | 10.16        | 62.08             | 37.92                | 90.37               | 91.46                  |
+| Womens        | Jacket       | Indigo Rain Jacket - Womens      | 1245           | 20724.44      | 2930.56        | 5.60         | 58.31             | 41.69                | 48.95               | 51.32                  |
+| Womens        | Jacket       | Khaki Suit Jacket - Womens       | 1296           | 26252.66      | 3555.34        | 7.10         | 61.31             | 38.69                | 58.27               | 61.18                  |
+| Womens        | Jacket       | Grey Fashion Jacket - Womens     | 1254           | 59200.74      | 8515.26        | 16.00        | 63.52             | 36.48                | 144.53              | 151.03                 |
+| Womens        | Jeans        | Cream Relaxed Jeans - Womens     | 1205           | 10595.50      | 1454.50        | 2.86         | 58.93             | 41.07                | 26.28               | 28.10                  |
+| Womens        | Jeans        | Navy Oversized Jeans - Womens    | 1224           | 13983.06      | 1928.94        | 3.78         | 62.34             | 37.66                | 34.77               | 35.04                  |
+| Womens        | Jeans        | Black Straight Jeans - Womens    | 1224           | 34243.52      | 4924.48        | 9.26         | 62.35             | 37.65                | 82.92               | 85.06                  |
+
+
+
+- If we want the data for any other month, in the where condition, you will just change the month number, that's it.
+
+---
 
  ## Bonus Challenge
+
+**Use a single SQL query to transform the product_hierarchy and product_prices datasets to the product_details table.**
+
+<br>
+
+**Hint: you may want to consider using a recursive CTE to solve this problem!**
+
+#### Final Query
+```` sql
+WITH cte AS (
+    SELECT 
+        p.product_id,
+        p.price,
+        h.parent_id,
+        h.level_text,
+        p.id AS style_id,
+        h.level_text AS style_name
+    FROM 
+        balanced_tree.product_prices p
+    JOIN 
+        balanced_tree.product_hierarchy h
+    ON 
+        p.id = h.id
+), 
+cte2 AS (
+    SELECT 
+        cte.product_id,
+        cte.price,
+        CONCAT(cte.level_text, ' ', h.level_text) AS product_name,
+        h.parent_id,
+        h.id AS segment_id,
+        cte.style_id,
+        h.level_text AS segment_name,
+        cte.style_name
+    FROM 
+        cte
+    JOIN 
+        balanced_tree.product_hierarchy h
+    ON 
+        cte.parent_id = h.id
+), 
+product_details AS (
+    SELECT 
+        cte2.product_id,
+        cte2.price,
+        CONCAT(cte2.product_name, ' - ', h.level_text) AS product_name,
+        h.id AS category_id,
+        cte2.segment_id,
+        cte2.style_id,
+        h.level_text AS category_name,
+        cte2.segment_name,
+        cte2.style_name
+    FROM 
+        cte2
+    JOIN 
+        balanced_tree.product_hierarchy h
+    ON 
+        cte2.parent_id = h.id
+)
+
+SELECT 
+    * 
+FROM 
+    product_details;
+````
+#### Output Table
+
+| product_id | price | product_name                     | category_id | segment_id | style_id | category_name | segment_name | style_name          |
+| ---------- | ----- | -------------------------------- | ----------- | ---------- | -------- | ------------- | ------------ | ------------------- |
+| c4a632     | 13    | Navy Oversized Jeans - Womens    | 1           | 3          | 7        | Womens        | Jeans        | Navy Oversized      |
+| e83aa3     | 32    | Black Straight Jeans - Womens    | 1           | 3          | 8        | Womens        | Jeans        | Black Straight      |
+| e31d39     | 10    | Cream Relaxed Jeans - Womens     | 1           | 3          | 9        | Womens        | Jeans        | Cream Relaxed       |
+| d5e9a6     | 23    | Khaki Suit Jacket - Womens       | 1           | 4          | 10       | Womens        | Jacket       | Khaki Suit          |
+| 72f5d4     | 19    | Indigo Rain Jacket - Womens      | 1           | 4          | 11       | Womens        | Jacket       | Indigo Rain         |
+| 9ec847     | 54    | Grey Fashion Jacket - Womens     | 1           | 4          | 12       | Womens        | Jacket       | Grey Fashion        |
+| 5d267b     | 40    | White Tee Shirt - Mens           | 2           | 5          | 13       | Mens          | Shirt        | White Tee           |
+| c8d436     | 10    | Teal Button Up Shirt - Mens      | 2           | 5          | 14       | Mens          | Shirt        | Teal Button Up      |
+| 2a2353     | 57    | Blue Polo Shirt - Mens           | 2           | 5          | 15       | Mens          | Shirt        | Blue Polo           |
+| f084eb     | 36    | Navy Solid Socks - Mens          | 2           | 6          | 16       | Mens          | Socks        | Navy Solid          |
+| b9a74d     | 17    | White Striped Socks - Mens       | 2           | 6          | 17       | Mens          | Socks        | White Striped       |
+| 2feb6b     | 29    | Pink Fluro Polkadot Socks - Mens | 2           | 6          | 18       | Mens          | Socks        | Pink Fluro Polkadot |
+
+---
+
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+
+### Anyways Happy Fiddling with the Data. See you in the next case study.
