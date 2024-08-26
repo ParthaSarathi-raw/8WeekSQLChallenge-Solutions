@@ -1,4 +1,4 @@
-# Case Study - 1 : Balanced Tree Clothing Co.
+# Case Study - 7 : Balanced Tree Clothing Co.
 
 All the data and questions that I've answered in this markdown can be found at  [Dannys Website](https://8weeksqlchallenge.com/case-study-7/).
 
