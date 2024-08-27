@@ -10,27 +10,98 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **1) Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month**
 
  #### Final Query
-
+```` sql
+ALTER TABLE fresh_segments.interest_metrics 
+ALTER month_year TYPE DATE using to_date(month_year,'mm-yyyy');
+SELECT month_year FROM fresh_segments.interest_metrics
+````
  #### Output Table
-  
+ 
+| month_year               |
+| ------------------------ |
+| 2018-07-01T00:00:00.000Z |
+| 2018-07-01T00:00:00.000Z |
+| 2018-07-01T00:00:00.000Z |
+| 2018-07-01T00:00:00.000Z |
+| 2018-07-01T00:00:00.000Z |
+
+- We can see that the data type has changed.
+
+---
+
+
 **2) What is count of records in the fresh_segments.interest_metrics for each month_year value sorted in chronological order (earliest to latest) with the null values appearing first?**
 
  #### Final Query
-
+```` sql
+SELECT month_year,count(*) FROM fresh_segments.interest_metrics 
+GROUP BY 1 ORDER BY month_year 
+NULLS FIRST;
+````
  #### Output Table
- 
+
+ - Only showing first 5 rows.
+
+
+| month_year               | count |
+| ------------------------ | ----- |
+|                          | 1194  |
+| 2018-07-01T00:00:00.000Z | 729   |
+| 2018-08-01T00:00:00.000Z | 767   |
+| 2018-09-01T00:00:00.000Z | 780   |
+| 2018-10-01T00:00:00.000Z | 857   |
+
+---
+
 **3) What do you think we should do with these null values in the fresh_segments.interest_metrics**
 
- #### Final Query
+- Get rid of them.
 
+ #### Final Query
+```` sql
+DELETE FROM fresh_segments.interest_metrics WHERE month_year is NULL;
+SELECT month_year,count(*) FROM fresh_segments.interest_metrics 
+GROUP BY 1 ORDER BY month_year 
+NULLS FIRST;
+````
  #### Output Table
  
+| month_year               | count |
+| ------------------------ | ----- |
+| 2018-07-01T00:00:00.000Z | 729   |
+| 2018-08-01T00:00:00.000Z | 767   |
+| 2018-09-01T00:00:00.000Z | 780   |
+| 2018-10-01T00:00:00.000Z | 857   |
+| 2018-11-01T00:00:00.000Z | 928   |
+
+- Now we can see that the null values are gone.
+
+---
+
 **4) How many interest_id values exist in the fresh_segments.interest_metrics table but not in the fresh_segments.interest_map table? What about the other way around?**
 
  #### Final Query
+```` sql
+SELECT SUM(CASE WHEN id IS NULL THEN 1 ELSE 0 END) AS ids_present_in_metrics_but_not_in_map
+FROM fresh_segments.interest_metrics met
+LEFT JOIN fresh_segments.interest_map map ON met.interest_id::integer = map.id;
 
+SELECT SUM(CASE WHEN interest_id IS NULL THEN 1 ELSE 0 END) AS ids_present_in_map_but_not_in_metrics
+FROM fresh_segments.interest_metrics met
+RIGHT JOIN fresh_segments.interest_map map ON met.interest_id::integer = map.id;
+````
  #### Output Table
  
+| ids_present_in_metrics_but_not_in_map |
+| ------------------------------------- |
+| 0                                     |
+
+| ids_present_in_map_but_not_in_metrics |
+| ------------------------------------- |
+| 7                                     |
+
+---
+
 **5) Summarise the id values in the fresh_segments.interest_map by its total record count in this table**
 
  #### Final Query
