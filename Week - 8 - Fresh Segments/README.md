@@ -193,9 +193,25 @@ WHERE month_year = date_trunc('month',created_at);
 **1) Which interests have been present in all month_year dates in our dataset?**
 
  #### Final Query
-
+```` sql
+SELECT interest_name,id FROM (SELECT interest_name,id,month_year FROM CTE GROUP BY 1,2,3) temp
+GROUP BY 1,2
+HAVING count(*) = (SELECT count(distinct month_year) FROM CTE);
+````
  #### Output Table
- 
+
+- Only showing 5 rows, the actual output has 480 rows, which represent every interest that is present in all months.
+
+| interest_name                                        | id    |
+| ---------------------------------------------------- | ----- |
+| Ski House Second Home Owners                         | 6107  |
+| Foreman and Construction Managers                    | 7529  |
+| Los Angeles Trip Planners                            | 6302  |
+| North Carolina Travel Researchers                    | 7540  |
+| Food Industry Professionals                          | 7461  |
+
+--- 
+
 **2) Using this same total_months measure - calculate the cumulative percentage of all records starting at 14 months - which total_months value passes the 90% cumulative percentage value?**
 
  #### Final Query
