@@ -381,12 +381,76 @@ GROUP BY month_year;
 ---
 
 ## Segment Analysis
+- Segment Analysis needs to be done on the interests which have more than or equal to 6 months worth of data. So for this segment , we will be using new CTE2 which has all the data with < 6 months removed.
+
+```` sql
+ALTER TABLE fresh_segments.interest_metrics 
+ALTER month_year TYPE DATE using to_date(month_year,'mm-yyyy');
+DELETE FROM fresh_segments.interest_metrics WHERE month_year is NULL;
+
+WITH CTE as (
+SELECT *
+FROM fresh_segments.interest_metrics met
+JOIN fresh_segments.interest_map map ON met.interest_id::integer = map.id),
+CTE2 as (
+SELECT *
+FROM cte 
+WHERE interest_id NOT IN (
+    SELECT interest_id 
+    FROM cte 
+    GROUP BY interest_id 
+    HAVING COUNT(DISTINCT month_year) < 6
+))
+SELECT * FROM CTE2;
+````
+
 **1) Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year**
 
  #### Final Query
+```` sql
+CTE3 as (
+SELECT * FROM CTE2 JOIN (SELECT id,max(composition) FROM CTE2 GROUP BY id) temp on 
+CTE2.id = temp.id and CTE2.composition = temp.max)
 
+SELECT interest_name, month_year FROM CTE3 ORDER BY composition DESC LIMIT 10; -- Top 10
+````
+```` sql
+SELECT interest_name, month_year FROM CTE3 ORDER BY composition ASC LIMIT 10; -- Bottom 10
+````
  #### Output Table
  
+- Top 10
+
+| interest_name                     | month_year               |
+| --------------------------------- | ------------------------ |
+| Work Comes First Travelers        | 2018-12-01T00:00:00.000Z |
+| Gym Equipment Owners              | 2018-07-01T00:00:00.000Z |
+| Furniture Shoppers                | 2018-07-01T00:00:00.000Z |
+| Luxury Retail Shoppers            | 2018-07-01T00:00:00.000Z |
+| Luxury Boutique Hotel Researchers | 2018-10-01T00:00:00.000Z |
+| Luxury Bedding Shoppers           | 2018-12-01T00:00:00.000Z |
+| Shoe Shoppers                     | 2018-07-01T00:00:00.000Z |
+| Cosmetics and Beauty Shoppers     | 2018-07-01T00:00:00.000Z |
+| Luxury Hotel Guests               | 2018-07-01T00:00:00.000Z |
+| Luxury Retail Researchers         | 2018-07-01T00:00:00.000Z |
+
+- Bottom 10
+
+| interest_name                     | month_year               |
+| --------------------------------- | ------------------------ |
+| Astrology Enthusiasts             | 2018-08-01T00:00:00.000Z |
+| Medieval History Enthusiasts      | 2018-10-01T00:00:00.000Z |
+| Dodge Vehicle Shoppers            | 2019-03-01T00:00:00.000Z |
+| Xbox Enthusiasts                  | 2018-07-01T00:00:00.000Z |
+| Camaro Enthusiasts                | 2018-10-01T00:00:00.000Z |
+| League of Legends Video Game Fans | 2019-01-01T00:00:00.000Z |
+| Budget Mobile Phone Researchers   | 2019-08-01T00:00:00.000Z |
+| Super Mario Bros Fans             | 2018-07-01T00:00:00.000Z |
+| Oakland Raiders Fans              | 2019-08-01T00:00:00.000Z |
+| Budget Wireless Shoppers          | 2018-07-01T00:00:00.000Z |
+
+---
+
 **2) Which 5 interests had the lowest average ranking value?**
 
  #### Final Query
