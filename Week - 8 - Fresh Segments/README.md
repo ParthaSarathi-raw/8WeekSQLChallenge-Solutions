@@ -454,24 +454,129 @@ SELECT interest_name, month_year FROM CTE3 ORDER BY composition ASC LIMIT 10; --
 **2) Which 5 interests had the lowest average ranking value?**
 
  #### Final Query
-
+```` sql
+SELECT interest_name,id,round(avg(ranking),2) as avg_ranking FROM CTE2 
+GROUP BY 1,2
+ORDER BY 3 LIMIT 5;
+````
  #### Output Table
  
+| interest_name                  | id    | avg_ranking |
+| ------------------------------ | ----- | ----------- |
+| Winter Apparel Shoppers        | 41548 | 1.00        |
+| Fitness Activity Tracker Users | 42203 | 4.11        |
+| Mens Shoe Shoppers             | 115   | 5.93        |
+| Shoe Shoppers                  | 171   | 9.36        |
+| Preppy Clothing Shoppers       | 6206  | 11.86       |
+
+---
+
 **3) Which 5 interests had the largest standard deviation in their percentile_ranking value?**
 
  #### Final Query
-
+```` sql
+SELECT interest_name,id,stddev(percentile_ranking) FROM CTE2 GROUP BY 1,2 ORDER BY 3 DESC LIMIT 5 ;
+````
  #### Output Table
  
+| interest_name                          | id    | stddev             |
+| -------------------------------------- | ----- | ------------------ |
+| Techies                                | 23    | 30.17504708640347  |
+| Entertainment Industry Decision Makers | 20764 | 28.97491995962486  |
+| Oregon Trip Planners                   | 38992 | 28.318455623301368 |
+| Personalized Gift Shoppers             | 43546 | 26.24268591980848  |
+| Tampa and St Petersburg Trip Planners  | 10839 | 25.612267373272516 |
+
+---
+
 **4) For the 5 interests found in the previous question - what was minimum and maximum percentile_ranking values for each interest and its corresponding year_month value? Can you describe what is happening for these 5 interests?**
 
  #### Final Query
+```` sql
+, CTE3 AS (
+    SELECT 
+        CTE2.*,
+        ROW_NUMBER() OVER (
+            PARTITION BY id 
+            ORDER BY percentile_ranking
+        ) AS min_perc,
+        ROW_NUMBER() OVER (
+            PARTITION BY id 
+            ORDER BY percentile_ranking DESC
+        ) AS max_perc
+    FROM CTE2
+    WHERE (interest_name, id) IN (
+        SELECT 
+            interest_name,
+            id
+        FROM CTE2
+        GROUP BY interest_name, id
+        ORDER BY STDDEV(percentile_ranking) DESC
+        LIMIT 5
+    )
+)
 
+SELECT 
+    interest_name,
+    id,
+    month_year,
+    percentile_ranking
+FROM CTE3
+WHERE min_perc = 1 OR max_perc = 1
+ORDER BY id;
+````
  #### Output Table
  
-**5) How would you describe our customers in this segment based off their composition and ranking values? What sort of products or services should we show to these customers and what should we avoid?**
+| interest_name                          | id    | month_year               | percentile_ranking |
+| -------------------------------------- | ----- | ------------------------ | ------------------ |
+| Techies                                | 23    | 2019-08-01T00:00:00.000Z | 7.92               |
+| Techies                                | 23    | 2018-07-01T00:00:00.000Z | 86.69              |
+| Tampa and St Petersburg Trip Planners  | 10839 | 2019-03-01T00:00:00.000Z | 4.84               |
+| Tampa and St Petersburg Trip Planners  | 10839 | 2018-07-01T00:00:00.000Z | 75.03              |
+| Entertainment Industry Decision Makers | 20764 | 2019-08-01T00:00:00.000Z | 11.23              |
+| Entertainment Industry Decision Makers | 20764 | 2018-07-01T00:00:00.000Z | 86.15              |
+| Oregon Trip Planners                   | 38992 | 2019-07-01T00:00:00.000Z | 2.2                |
+| Oregon Trip Planners                   | 38992 | 2018-11-01T00:00:00.000Z | 82.44              |
+| Personalized Gift Shoppers             | 43546 | 2019-06-01T00:00:00.000Z | 5.7                |
+| Personalized Gift Shoppers             | 43546 | 2019-03-01T00:00:00.000Z | 73.15              |
 
- #### Final Query
+---
 
- #### Output Table
+## Index Analysis
+
+The index_value is a measure which can be used to reverse calculate the average composition for Fresh Segments’ clients. \
+
+Average composition can be calculated by dividing the composition column by the index_value column rounded to 2 decimal places. \
+
+**1) What is the top 10 interests by the average composition for each month?**
+
+#### Final Query
+
+#### Output Table
+ 
+**2) For all of these top 10 interests - which interest appears the most often?**
+
+#### Final Query
+
+#### Output Table
+ 
+**3) What is the average of the average composition for the top 10 interests for each month?**
+
+#### Final Query
+
+#### Output Table
+ 
+**4) What is the 3 month rolling average of the max average composition value from September 2018 to August 2019 and include the previous top ranking interests in the same output shown below.**
+
+#### Final Query
+
+#### Output Table
+ 
+**5) Provide a possible reason why the max average composition might change from month to month? Could it signal something is not quite right with the overall business model for Fresh Segments?**
+
+#### Final Query
+
+#### Output Table
+ 
+
  
