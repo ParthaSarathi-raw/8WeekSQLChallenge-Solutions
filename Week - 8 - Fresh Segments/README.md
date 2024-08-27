@@ -214,28 +214,172 @@ HAVING count(*) = (SELECT count(distinct month_year) FROM CTE);
 
 **2) Using this same total_months measure - calculate the cumulative percentage of all records starting at 14 months - which total_months value passes the 90% cumulative percentage value?**
 
- #### Final Query
+- I might be using the below CTE table in other questions as well.
 
+ #### Final Query
+```` sql
+WITH CTE as (
+SELECT *
+FROM fresh_segments.interest_metrics met
+JOIN fresh_segments.interest_map map ON met.interest_id::integer = map.id),
+CTE2 AS (
+    SELECT no_of_months, COUNT(id) 
+    FROM (
+        SELECT interest_name, id, COUNT(*) AS no_of_months 
+        FROM (
+            SELECT interest_name, id, month_year 
+            FROM CTE 
+            GROUP BY interest_name, id, month_year
+        ) AS temp1
+        GROUP BY interest_name, id
+        ORDER BY no_of_months DESC
+    ) AS temp2
+    GROUP BY no_of_months
+    ORDER BY no_of_months DESC
+)
+
+SELECT * 
+FROM (
+    SELECT no_of_months,
+           ROUND(100.0 * SUM(count) OVER (ORDER BY no_of_months DESC) / SUM(count) OVER (), 2) AS cumulative_percentage
+    FROM CTE2
+) AS temp
+WHERE cumulative_percentage > 90;
+````
  #### Output Table
  
+| no_of_months | cumulative_percentage |
+| ------------ | --------------------- |
+| 6            | 90.85                 |
+| 5            | 94.01                 |
+| 4            | 96.67                 |
+| 3            | 97.92                 |
+| 2            | 98.92                 |
+| 1            | 100.00                |
+
+---
+
 **3) If we were to remove all interest_id values which are lower than the total_months value we found in the previous question - how many total data points would we be removing?**
 
- #### Final Query
+- This question really didn't make any sense to me. So I'm assuming we have to remove all the interest_id values which have no_of_months < 6.
+- If you do understand what this question means, please let me know and I will make necessary changes.
 
+ #### Final Query
+```` sql
+SELECT COUNT(interest_id) 
+FROM cte 
+WHERE interest_id IN (
+    SELECT interest_id 
+    FROM cte 
+    GROUP BY interest_id 
+    HAVING COUNT(DISTINCT month_year) < 6
+);
+````
  #### Output Table
  
+| count |
+| ----- |
+| 400   |
+
+---
+
 **4) Does this decision make sense to remove these data points from a business perspective? Use an example where there are all 14 months present to a removed interest example for your arguments - think about what it means to have less months present from a segment perspective.**
 
+- These interests have < 6 months of data, so we can't really use this less data to draw any meaning conclusion, so it kinda makes sense to avoid these while doing our analysis.
+- And we are also only just removing a small percentage from the data, so no problem.
+  
  #### Final Query
+```` sql
+, cte2 AS (
+    SELECT 
+        month_year,
+        SUM(CASE 
+                WHEN interest_id NOT IN (
+                    SELECT interest_id 
+                    FROM cte 
+                    GROUP BY interest_id 
+                    HAVING COUNT(DISTINCT month_year) < 6
+                ) 
+                THEN 1 
+            END) AS not_removed,
+        SUM(CASE 
+                WHEN interest_id IN (
+                    SELECT interest_id 
+                    FROM cte 
+                    GROUP BY interest_id 
+                    HAVING COUNT(DISTINCT month_year) < 6
+                ) 
+                THEN 1 
+            END) AS removed
+    FROM cte 
+    GROUP BY month_year
+    ORDER BY month_year
+)
 
+SELECT 
+    month_year,
+    not_removed,
+    removed,
+    100.0 * removed / (removed + not_removed) AS perc_removed
+FROM cte2;
+````
  #### Output Table
- 
+
+| month_year               | not_removed | removed | perc_removed           |
+| ------------------------ | ----------- | ------- | ---------------------- |
+| 2018-07-01T00:00:00.000Z | 709         | 20      | 2.7434842249657064     |
+| 2018-08-01T00:00:00.000Z | 752         | 15      | 1.9556714471968709     |
+| 2018-09-01T00:00:00.000Z | 774         | 6       | 0.76923076923076923077 |
+| 2018-10-01T00:00:00.000Z | 853         | 4       | 0.46674445740956826138 |
+| 2018-11-01T00:00:00.000Z | 925         | 3       | 0.32327586206896551724 |
+| 2018-12-01T00:00:00.000Z | 986         | 9       | 0.90452261306532663317 |
+| 2019-01-01T00:00:00.000Z | 966         | 7       | 0.71942446043165467626 |
+| 2019-02-01T00:00:00.000Z | 1072        | 49      | 4.3710972346119536     |
+| 2019-03-01T00:00:00.000Z | 1078        | 58      | 5.1056338028169014     |
+| 2019-04-01T00:00:00.000Z | 1035        | 64      | 5.8234758871701547     |
+| 2019-05-01T00:00:00.000Z | 827         | 30      | 3.5005834305717620     |
+| 2019-06-01T00:00:00.000Z | 804         | 20      | 2.4271844660194175     |
+| 2019-07-01T00:00:00.000Z | 836         | 28      | 3.2407407407407407     |
+| 2019-08-01T00:00:00.000Z | 1062        | 87      | 7.5718015665796345     |
+
+---
+
+
 **5) After removing these interests - how many unique interests are there for each month?**
 
  #### Final Query
-
+```` sql
+SELECT month_year,count(distinct id) as distinct_interests 
+FROM cte 
+WHERE interest_id NOT IN (
+    SELECT interest_id 
+    FROM cte 
+    GROUP BY interest_id 
+    HAVING COUNT(DISTINCT month_year) < 6
+)
+GROUP BY month_year;
+````
  #### Output Table
- 
+
+| month_year               | distinct_interests |
+| ------------------------ | ------------------ |
+| 2018-07-01T00:00:00.000Z | 709                |
+| 2018-08-01T00:00:00.000Z | 752                |
+| 2018-09-01T00:00:00.000Z | 774                |
+| 2018-10-01T00:00:00.000Z | 853                |
+| 2018-11-01T00:00:00.000Z | 925                |
+| 2018-12-01T00:00:00.000Z | 986                |
+| 2019-01-01T00:00:00.000Z | 966                |
+| 2019-02-01T00:00:00.000Z | 1072               |
+| 2019-03-01T00:00:00.000Z | 1078               |
+| 2019-04-01T00:00:00.000Z | 1035               |
+| 2019-05-01T00:00:00.000Z | 827                |
+| 2019-06-01T00:00:00.000Z | 804                |
+| 2019-07-01T00:00:00.000Z | 836                |
+| 2019-08-01T00:00:00.000Z | 1062               |
+
+---
+
 ## Segment Analysis
 **1) Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year**
 
