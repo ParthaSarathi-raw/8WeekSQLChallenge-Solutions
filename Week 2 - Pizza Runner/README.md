@@ -301,45 +301,147 @@ GROUP BY 1;
 **1) How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
 
 #### Final Query
-
+```` sql
+SELECT 
+   ((registration_date - '2021-01-01')/7)+1 as week_number,
+   registration_date - ((registration_date-'2021-01-01')%7) as week_start_date,
+   count(*)
+FROM pizza_runner.runners
+GROUP BY 1,2 ORDER BY 2;
+````
 #### Final Output
- 
+
+| week_number | week_start_date          | count |
+| ----------- | ------------------------ | ----- |
+| 1           | 2021-01-01T00:00:00.000Z | 2     |
+| 2           | 2021-01-08T00:00:00.000Z | 1     |
+| 3           | 2021-01-15T00:00:00.000Z | 1     |
+
+---
+
 **2) What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
 
 #### Final Query
-
+```` sql
+SELECT runner_id,
+	round(avg(extract(minute from pickup_time::timestamp-order_time))) as minutes_took_to_reach_HQ 
+FROM(
+	SELECT order_id,runner_id,order_time,pickup_time
+	FROM CTE
+	WHERE pickup_time is not null
+	GROUP BY 1,2,3,4
+)temp
+GROUP BY 1 ORDER BY 1;
+````
 #### Final Output
- 
+
+| runner_id | minutes_took_to_reach_hq |
+| --------- | ------------------------ |
+| 1         | 14                       |
+| 2         | 20                       |
+| 3         | 10                       |
+
+---
+
 **3) Is there any relationship between the number of pizzas and how long the order takes to prepare?**
 
 #### Final Query
-
+```` sql
+SELECT count as no_of_pizzas,avg(time_taken_to_prep) as avg_time_taken_to_prep
+FROM (
+	SELECT order_id,count(*),
+  	extract(minute from pickup_time::timestamp-order_time) as time_taken_to_prep FROM CTE
+	WHERE pickup_time is not NULL
+	GROUP BY 1,3
+) temp
+GROUP BY 1 ORDER BY 1;
+````
 #### Final Output
- 
+
+| no_of_pizzas | avg_time_taken_to_prep |
+| ------------ | ---------------------- |
+| 1            | 12                     |
+| 2            | 18                     |
+| 3            | 29                     |
+
+---
+
 **4) What was the average distance travelled for each customer?**
 
 #### Final Query
-
+```` sql
+SELECT customer_id,round(avg(distance),2) as avg_distance_travelled FROM CTE
+WHERE cancellation is null
+GROUP BY 1 ORDER BY 1;
+````
 #### Final Output
- 
+
+| customer_id | avg_distance_travelled |
+| ----------- | ---------------------- |
+| 101         | 20.00                  |
+| 102         | 16.73                  |
+| 103         | 23.40                  |
+| 104         | 10.00                  |
+| 105         | 25.00                  |
+
+---
 **5) What was the difference between the longest and shortest delivery times for all orders?**
 
 #### Final Query
-
+```` sql
+SELECT max(duration) - min(duration) as diff_between_longest_and_shortest_delivery_time FROM CTE
+WHERE cancellation is null;
+````
 #### Final Output
- 
+
+| diff_between_longest_and_shortest_delivery_time |
+| ----------------------------------------------- |
+| 30                                              |
+
+---
+
 **6) What was the average speed for each runner for each delivery and do you notice any trend for these values?**
 
 #### Final Query
-
+```` sql
+SELECT runner_id,round(avg(60.0*distance/duration),2) as avg_speed_in_km_per_hr 
+FROM (
+	SELECT runner_id,order_id,distance,duration FROM CTE
+	WHERE cancellation is null
+	GROUP BY 1,2,3,4
+) temp
+GROUP BY 1 ORDER BY 1;
+````
 #### Final Output
- 
+
+| runner_id | avg_speed_in_km_per_hr |
+| --------- | ---------------------- |
+| 1         | 45.54                  |
+| 2         | 62.90                  |
+| 3         | 40.00                  |
+
+---
+
 **7) What is the successful delivery percentage for each runner?**
 
 #### Final Query
-
+```` sql
+SELECT runner_id,
+round(100.0*sum(case when cancellation is null then 1 else 0 end)/count(*),2) as successful_delivery_percentage 
+FROM (
+	SELECT runner_id,order_id,cancellation FROM CTE GROUP BY 1,2,3
+) temp
+GROUP BY 1 ORDER BY 1;
+````
 #### Final Output
- 
+
+| runner_id | successful_delivery_percentage |
+| --------- | ------------------------------ |
+| 1         | 100.00                         |
+| 2         | 75.00                          |
+| 3         | 50.00                          |
+
+---
 
 ## Ingredient Optimization
 
