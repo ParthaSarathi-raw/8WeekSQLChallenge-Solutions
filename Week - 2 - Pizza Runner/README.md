@@ -677,6 +677,136 @@ LEFT JOIN
 
    - For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
 
+#### Final Query
+```` sql
+WITH customers_orders_clean AS (
+    SELECT 
+        row_number() OVER() AS rn,
+        order_id, customer_id, pizza_id,
+        CASE WHEN exclusions = '' OR exclusions = 'null' THEN NULL ELSE exclusions END AS exclusions,
+        CASE WHEN extras = '' OR extras = 'null' THEN NULL ELSE extras END AS extras,
+        order_time
+    FROM pizza_runner.customer_orders
+),
+COOK_BOOK AS (
+    SELECT 
+        pizza_id, pizza_name, t.topping_id, t.topping_name 
+    FROM (
+        SELECT 
+            n.*, unnest(string_to_array(toppings, ', ')) AS topping_id 
+        FROM pizza_runner.pizza_names n
+        JOIN pizza_runner.pizza_recipes r ON n.pizza_id = r.pizza_id
+    ) temp
+    JOIN pizza_runner.pizza_toppings t ON temp.topping_id::integer = t.topping_id
+    ORDER BY 1, 3
+),
+extras AS (
+    SELECT 
+        rn, topping_id, topping_name 
+    FROM (
+        SELECT 
+            rn, unnest(string_to_array(extras, ', ')) AS extra_id 
+        FROM customers_orders_clean
+    ) temp
+    JOIN pizza_runner.pizza_toppings t ON temp.extra_id::integer = t.topping_id
+),
+exclusions AS (
+    SELECT 
+        rn, topping_id, topping_name AS exclusion_name
+    FROM (
+        SELECT 
+            rn, unnest(string_to_array(exclusions, ', ')) AS exclusion_id 
+        FROM customers_orders_clean
+    ) temp
+    JOIN pizza_runner.pizza_toppings t ON temp.exclusion_id::integer = t.topping_id
+),
+ingredients AS (
+    SELECT 
+        c.rn, b.topping_id, topping_name, exclusion_name 
+    FROM customers_orders_clean c 
+    JOIN COOK_BOOK b ON c.pizza_id = b.pizza_id
+    LEFT JOIN exclusions ON c.rn = exclusions.rn AND b.topping_name = exclusions.exclusion_name
+    UNION ALL
+    SELECT rn, topping_id, topping_name, NULL AS exclusion_name 
+    FROM extras
+),
+ingredient_list AS (
+    SELECT 
+        rn, string_agg(
+            CASE WHEN cnt = 1 THEN topping_name ELSE concat(cnt::text, 'x ', topping_name) END, ', ' 
+            ORDER BY topping_id
+        ) AS ingredients_list 
+    FROM (
+        SELECT 
+            rn, topping_id, topping_name, COUNT(*) AS cnt 
+        FROM ingredients 
+        WHERE exclusion_name IS NULL
+        GROUP BY 1, 2, 3 
+        ORDER BY 1, 2
+    ) temp
+    GROUP BY rn
+)
+SELECT 
+    order_id, ingredients_list 
+FROM 
+    customers_orders_clean c 
+JOIN 
+    ingredient_list l ON c.rn = l.rn;
+````
+
+#### Output Table
+
+| order_id | ingredients_list                                                         |
+| -------- | ------------------------------------------------------------------------ |
+| 1        | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami    |
+| 2        | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami    |
+| 3        | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami    |
+| 3        | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce               |
+| 4        | Bacon, BBQ Sauce, Beef, Chicken, Mushrooms, Pepperoni, Salami            |
+| 4        | Bacon, BBQ Sauce, Beef, Chicken, Mushrooms, Pepperoni, Salami            |
+| 4        | Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce                       |
+| 5        | 2x Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
+| 6        | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce               |
+| 7        | Bacon, Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce        |
+| 8        | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami    |
+| 9        | 2x Bacon, BBQ Sauce, Beef, 2x Chicken, Mushrooms, Pepperoni, Salami      |
+| 10       | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami    |
+| 10       | 2x Bacon, Beef, 2x Cheese, Chicken, Pepperoni, Salami                    |
+
+---
+
+**6) What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?**
+
+- We are going to use `ingredients` table that we have created as CTE in the previous solution to directly get the answer.
+
+#### Final Query
+```` sql
+SELECT topping_name as ingredient,count(*) as no_of_times_ingredient_used FROM ingredients 
+WHERE exclusion_name is NULL
+GROUP BY 1
+ORDER BY 2 DESC;
+````
+- Yay finally a short and sweet query lol.
+
+#### Output Table
+
+| ingredient   | no_of_times_ingredient_used |
+| ------------ | --------------------------- |
+| Bacon        | 14                          |
+| Mushrooms    | 13                          |
+| Chicken      | 11                          |
+| Cheese       | 11                          |
+| Pepperoni    | 10                          |
+| Salami       | 10                          |
+| Beef         | 10                          |
+| BBQ Sauce    | 9                           |
+| Tomato Sauce | 4                           |
+| Onions       | 4                           |
+| Tomatoes     | 4                           |
+| Peppers      | 4                           |
+
+---
+
 ## Pricing and Ratings
 
 
