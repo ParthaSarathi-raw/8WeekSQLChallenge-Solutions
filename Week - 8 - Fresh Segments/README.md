@@ -159,9 +159,35 @@ WHERE id = 21246;
 **7) Are there any records in your joined table where the month_year value is before the created_at value from the fresh_segments.interest_map table? Do you think these values are valid and why?**
 
  #### Final Query
+```` sql
+SELECT count(*)
+FROM fresh_segments.interest_metrics met
+JOIN fresh_segments.interest_map map ON met.interest_id::integer = map.id
+WHERE month_year < created_at;
 
+SELECT count(*)
+FROM fresh_segments.interest_metrics met
+JOIN fresh_segments.interest_map map ON met.interest_id::integer = map.id
+WHERE month_year = date_trunc('month',created_at);
+````
  #### Output Table
+ 
+- Query : 1
 
+| count |
+| ----- |
+| 188   |
+
+- Query : 2
+  
+| count |
+| ----- |
+| 188   |
+
+- Yes there are 188 queries whose month_year < created_date. But this is because month_year is the first date of that particular month. We have confirmed this by running the second query which gives the same exact count of 188.
+- Hence there are correct values only, no need to remove them.
+
+---
  ## Interest Analysis
 
 **1) Which interests have been present in all month_year dates in our dataset?**
