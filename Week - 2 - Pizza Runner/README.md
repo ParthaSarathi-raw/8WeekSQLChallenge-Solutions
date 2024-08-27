@@ -576,8 +576,6 @@ WHERE
 
 **Note : I have used row_number to index all the rows in customers_orders_clean so it will be easier to combine the tables.**
 
-<br>
-
 **Note2 : Again, this is not meant to be an easy question. I'm just posting my complete solution in the query. If you've gone through case study 1 and 3 - 8 , then I'm pretty sure you can look at my solution and understand my approach. However if you still don't get it, please reach out to me, I will update the solution with detailed explanations.**
 
 #### Final Query :
