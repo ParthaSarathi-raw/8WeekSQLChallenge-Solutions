@@ -500,6 +500,184 @@ FROM COOK_BOOK GROUP BY 1;
 
 **2) What was the most commonly added extra?**
 
+#### Final Query :
+```` sql
+SELECT 
+    topping_name AS most_common_extra 
+FROM (
+    SELECT 
+        topping_name,
+        COUNT(*),
+        DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS dn 
+    FROM (
+        SELECT 
+            unnest(string_to_array(extras, ', ')) AS extra_topping_id 
+        FROM 
+            customers_orders_clean
+    ) temp 
+    JOIN 
+        pizza_runner.pizza_toppings t ON temp.extra_topping_id::integer = t.topping_id
+    GROUP BY 
+        1
+) temp 
+WHERE 
+    dn = 1;
+````
+
+#### Output Table
+
+| most_common_extra |
+| ----------------- |
+| Bacon             |
+
+---
+
+**3) What was the most common exclusion?**
+
+#### Final Query
+
+```` sql
+SELECT 
+    topping_name AS most_excluded 
+FROM (
+    SELECT 
+        topping_name,
+        COUNT(*),
+        DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS dn 
+    FROM (
+        SELECT 
+            unnest(string_to_array(exclusions, ', ')) AS excluded_topping_id 
+        FROM 
+            customers_orders_clean
+    ) temp 
+    JOIN 
+        pizza_runner.pizza_toppings t ON temp.excluded_topping_id::integer = t.topping_id
+    GROUP BY 
+        1
+) temp 
+WHERE 
+    dn = 1;
+````
+
+#### Output Table
+
+| most_excluded |
+| ------------- |
+| Cheese        |
+
+---
+
+**4) Generate an order item for each record in the customers_orders table in the format of one of the following:**
+
+   - Meat Lovers
+  -  Meat Lovers - Exclude Beef
+   - Meat Lovers - Extra Bacon
+   - Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers
+
+**Note : I have used row_number to index all the rows in customers_orders_clean so it will be easier to combine the tables.**
+
+<br>
+
+**Note2 : Again, this is not meant to be an easy question. I'm just posting my complete solution in the query. If you've gone through case study 1 and 3 - 8 , then I'm pretty sure you can look at my solution and understand my approach. However if you still don't get it, please reach out to me, I will update the solution with detailed explanations.**
+
+#### Final Query :
+```` sql
+WITH customers_orders_clean AS (
+    SELECT 
+        row_number() OVER() AS rn,
+        order_id,
+        customer_id,
+        pizza_id,
+        CASE 
+            WHEN exclusions = '' OR exclusions = 'null' THEN NULL 
+            ELSE exclusions 
+        END AS exclusions,
+        CASE 
+            WHEN extras = '' OR extras = 'null' THEN NULL 
+            ELSE extras 
+        END AS extras,
+        order_time
+    FROM 
+        pizza_runner.customer_orders
+),
+extras AS (
+    SELECT 
+        rn,
+        string_agg(topping_name, ', ') AS extras_list 
+    FROM (
+        SELECT 
+            rn,
+            unnest(string_to_array(extras, ', ')) AS extra_id 
+        FROM 
+            customers_orders_clean
+    ) temp
+    JOIN 
+        pizza_runner.pizza_toppings t ON temp.extra_id::integer = t.topping_id
+    GROUP BY 
+        rn
+),
+exclusions AS (
+    SELECT 
+        rn,
+        string_agg(topping_name, ', ') AS exclusions_list 
+    FROM (
+        SELECT 
+            rn,
+            unnest(string_to_array(exclusions, ', ')) AS exclusion_id 
+        FROM 
+            customers_orders_clean
+    ) temp
+    JOIN 
+        pizza_runner.pizza_toppings t ON temp.exclusion_id::integer = t.topping_id
+    GROUP BY 
+        rn
+)
+SELECT 
+    order_id,
+    CASE 
+        WHEN extras IS NULL AND exclusions IS NULL THEN pizza_name
+        WHEN extras IS NOT NULL AND exclusions IS NULL THEN concat(pizza_name, ' - Extra ', extras_list)
+        WHEN extras IS NULL AND exclusions IS NOT NULL THEN concat(pizza_name, ' - Exclude ', exclusions_list)
+        ELSE concat(pizza_name, ' - Exclude ', exclusions_list, ' - Extra ', extras_list) 
+    END AS order_list
+FROM 
+    customers_orders_clean c
+LEFT JOIN 
+    extras ON c.rn = extras.rn
+LEFT JOIN 
+    exclusions ON c.rn = exclusions.rn
+LEFT JOIN 
+    pizza_runner.pizza_names n ON c.pizza_id = n.pizza_id;
+````
+
+#### Output Table
+
+| order_id | order_list                                                      |
+| -------- | --------------------------------------------------------------- |
+| 1        | Meatlovers                                                      |
+| 2        | Meatlovers                                                      |
+| 3        | Meatlovers                                                      |
+| 3        | Vegetarian                                                      |
+| 4        | Meatlovers - Exclude Cheese                                     |
+| 4        | Meatlovers - Exclude Cheese                                     |
+| 4        | Vegetarian - Exclude Cheese                                     |
+| 5        | Meatlovers - Extra Bacon                                        |
+| 6        | Vegetarian                                                      |
+| 7        | Vegetarian - Extra Bacon                                        |
+| 8        | Meatlovers                                                      |
+| 9        | Meatlovers - Exclude Cheese - Extra Bacon, Chicken              |
+| 10       | Meatlovers                                                      |
+| 10       | Meatlovers - Exclude BBQ Sauce, Mushrooms - Extra Bacon, Cheese |
+
+- Again it might look like some big complex query at first, but if you go through each step it's really simple.
+- It just involves the whole process of breaking down extras and exclusions list and then combining with their respective names and rejoining them, nothing complicated, just looks big that's it.
+- Once you understand what's going in, it is just piece of cake.
+
+---
+
+**5) Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients**
+
+   - For example: "Meat Lovers: 2xBacon, Beef, ... , Salami"
 
 ## Pricing and Ratings
 
