@@ -754,6 +754,7 @@ JOIN
     ingredient_list l ON c.rn = l.rn;
 ````
 - Funfact : This might be the longest query I've written while solving all 8 case studies, but it just ran in 3.7 ms lol.
+- Also we are still playing by danny's rules. Each and every question in this case study can be answered using 1 query only. I want to highlight that the above big query while it maybe big, is just a singular query.
 
 #### Output Table
 
