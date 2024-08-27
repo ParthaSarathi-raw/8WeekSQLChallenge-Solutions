@@ -445,6 +445,61 @@ GROUP BY 1 ORDER BY 1;
 
 ## Ingredient Optimization
 
+- Before we dive into questions, I want to combine `pizza_names`,`pizza_recipes` and `pizza_toppings` tables to make our calculations a bit easier.
+
+```` sql
+WITH COOK_BOOK AS (
+    SELECT 
+        pizza_id, pizza_name, t.topping_id, t.topping_name 
+    FROM (
+        SELECT 
+            n.*, unnest(string_to_array(toppings, ', ')) AS topping_id 
+        FROM 
+            pizza_runner.pizza_names n
+        JOIN 
+            pizza_runner.pizza_recipes r ON n.pizza_id = r.pizza_id
+    ) temp
+    JOIN 
+        pizza_runner.pizza_toppings t ON temp.topping_id::integer = t.topping_id
+    ORDER BY 
+        1, 3
+)
+SELECT * FROM COOK_BOOK;
+````
+| pizza_id | pizza_name | topping_id | topping_name |
+| -------- | ---------- | ---------- | ------------ |
+| 1        | Meatlovers | 1          | Bacon        |
+| 1        | Meatlovers | 2          | BBQ Sauce    |
+| 1        | Meatlovers | 3          | Beef         |
+| 1        | Meatlovers | 4          | Cheese       |
+| 1        | Meatlovers | 5          | Chicken      |
+| 1        | Meatlovers | 6          | Mushrooms    |
+| 1        | Meatlovers | 8          | Pepperoni    |
+| 1        | Meatlovers | 10         | Salami       |
+| 2        | Vegetarian | 4          | Cheese       |
+| 2        | Vegetarian | 6          | Mushrooms    |
+| 2        | Vegetarian | 7          | Onions       |
+| 2        | Vegetarian | 9          | Peppers      |
+| 2        | Vegetarian | 11         | Tomatoes     |
+| 2        | Vegetarian | 12         | Tomato Sauce |
+
+**1) What are the standard ingredients for each pizza?**
+
+#### Final Query :
+```` sql
+SELECT pizza_name,string_agg(topping_name,', ') as standard_ingredients 
+FROM COOK_BOOK GROUP BY 1;
+````
+
+| pizza_name | standard_ingredients                                                  |
+| ---------- | --------------------------------------------------------------------- |
+| Meatlovers | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami |
+| Vegetarian | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce            |
+
+---
+
+**2) What was the most commonly added extra?**
+
 
 ## Pricing and Ratings
 
