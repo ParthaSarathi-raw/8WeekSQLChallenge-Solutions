@@ -110,7 +110,7 @@ SELECT * FROM CTE;
 
 #### Final Query
 ```` sql
-SELECT count(*) as no_of_pizzas_ordered FROM customers_orders_clean;
+SELECT count(*) as no_of_pizzas_ordered FROM CTE;
 ````
 #### Final Output
 
@@ -124,7 +124,7 @@ SELECT count(*) as no_of_pizzas_ordered FROM customers_orders_clean;
 
 #### Final Query
 ```` sql
-SELECT count(distinct order_id) as unique_no_of_orders FROM customers_orders_clean;
+SELECT count(distinct order_id) as unique_no_of_orders FROM CTE;
 ````
 #### Final Output
 
@@ -138,8 +138,8 @@ SELECT count(distinct order_id) as unique_no_of_orders FROM customers_orders_cle
 
 #### Final Query
 ```` sql
-SELECT runner_id,count(*) as successful_orders_delivered 
-FROM runner_orders_clean 
+SELECT runner_id,count(distinct order_id) assuccessful_orders_delivered
+FROM CTE 
 WHERE cancellation IS NULL
 GROUP BY 1;
 ````
@@ -158,10 +158,7 @@ GROUP BY 1;
 #### Final Query
 ```` sql
 SELECT pizza_name,count(*) as pizzas_delivered_successfully 
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+FROM CTE
 WHERE cancellation is null
 GROUP BY 1;
 ````
@@ -179,12 +176,9 @@ GROUP BY 1;
 #### Final Query
 ```` sql
 SELECT customer_id,
-	sum(case when n.pizza_id = 1 then 1 else 0 end) as no_of_Meatlovers_ordered,
-	sum(case when n.pizza_id = 2 then 1 else 0 end) as no_of_Vegetarian_ordered
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+	sum(case when pizza_id = 1 then 1 else 0 end) as no_of_Meatlovers_ordered,
+	sum(case when pizza_id = 2 then 1 else 0 end) as no_of_Vegetarian_ordered
+FROM CTE
 GROUP BY 1
 ORDER BY 1;
 ````
@@ -205,12 +199,9 @@ ORDER BY 1;
 #### Final Query
 ```` sql
 SELECT count(*) as max_pizzas_delivered_in_single_order
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+FROM CTE
 WHERE cancellation is NULL
-GROUP BY c.order_id
+GROUP BY order_id
 ORDER BY 1 DESC
 LIMIT 1;
 ````
@@ -229,10 +220,7 @@ LIMIT 1;
 SELECT customer_id,
 	sum(case when exclusions is null and extras is null then 1 else 0 end) as no_changes,
     sum(case when exclusions is not null or extras is not null then 1 else 0 end) as atleast_1_change
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+FROM CTE
 WHERE cancellation is NULL
 GROUP BY 1 ORDER BY 1;
 ````
@@ -254,10 +242,7 @@ GROUP BY 1 ORDER BY 1;
 ```` sql
 SELECT 
     sum(case when exclusions is not null and extras is not null then 1 else 0 end) as no_of_delivered_pizzas_with_both_exclusions_and_extras
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+FROM CTE
 WHERE cancellation is NULL;
 ````
 #### Final Output
@@ -274,10 +259,7 @@ WHERE cancellation is NULL;
 ```` sql
 SELECT 
     extract(hour from order_time) as hour,count(*) as pizzas_ordered
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+FROM CTE
 GROUP BY 1 ORDER BY 1;
 ````
 #### Final Output
@@ -299,10 +281,7 @@ GROUP BY 1 ORDER BY 1;
 ```` sql
 SELECT 
     TO_CHAR(order_time,'day') as day,count(*) as pizzas_ordered
-FROM customers_orders_clean c 
-JOIN runner_orders_clean r 
-ON c.order_id = r.order_id 
-JOIN pizza_runner.pizza_names n on c.pizza_id = n.pizza_id
+FROM CTE
 GROUP BY 1;
 ````
 #### Final Output
