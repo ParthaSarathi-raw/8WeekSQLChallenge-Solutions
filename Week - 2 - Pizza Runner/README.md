@@ -753,6 +753,7 @@ FROM
 JOIN 
     ingredient_list l ON c.rn = l.rn;
 ````
+- Funfact : This might be the longest query I've written while solving all 8 case studies, but it just ran in 3.7 ms lol.
 
 #### Output Table
 
