@@ -4,6 +4,7 @@ All the data and questions that I've answered in this markdown can be found at  
 
 And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com/f/iRdsT76vaus813crPP8Ma4/10) using POSTGRE SQL V 13. If you get any kind of errors when you are executing my queries given below, you might be using some other dialect of SQL other than postgre sql v 13. Please look up alternate ways to achieve the same thing on your SQL dialect. However I do prefer just practising these questions on DB Fiddle itself.
 
+- Few questions in the case study are descriptive, so I've skipped those questions since SQL is not necessary for them.
 
 ## Data Exploration and Cleaning
 
@@ -548,35 +549,191 @@ The index_value is a measure which can be used to reverse calculate the average 
 
 Average composition can be calculated by dividing the composition column by the index_value column rounded to 2 decimal places. \
 
+- Let us add `average_composition` column to our table and perform calculations on them. 
+```` sql
+CTE2 as (
+SELECT cte.*,round((1.0*composition/index_value)::decimal,2) as average_composition
+FROM cte 
+WHERE interest_id NOT IN (
+    SELECT interest_id 
+    FROM cte 
+    GROUP BY interest_id 
+    HAVING COUNT(DISTINCT month_year) < 6
+))
+SELECT * FROM CTE2;
+````
+
 **1) What is the top 10 interests by the average composition for each month?**
 
 #### Final Query
-
+```` sql
+SELECT month_year, interest_name
+FROM (
+    SELECT 
+        month_year,
+        interest_name,
+        ROW_NUMBER() OVER (
+            PARTITION BY month_year 
+            ORDER BY average_composition DESC
+        ) AS rn
+    FROM CTE2
+) AS temp
+WHERE rn < 11;
+````
 #### Output Table
- 
+
+- Only showing data for 1 month. Actual output has data for 14 months.
+  
+| month_year               | interest_name                                        |
+| ------------------------ | ---------------------------------------------------- |
+| 2018-07-01T00:00:00.000Z | Las Vegas Trip Planners                              |
+| 2018-07-01T00:00:00.000Z | Gym Equipment Owners                                 |
+| 2018-07-01T00:00:00.000Z | Cosmetics and Beauty Shoppers                        |
+| 2018-07-01T00:00:00.000Z | Luxury Retail Shoppers                               |
+| 2018-07-01T00:00:00.000Z | Furniture Shoppers                                   |
+| 2018-07-01T00:00:00.000Z | Asian Food Enthusiasts                               |
+| 2018-07-01T00:00:00.000Z | Recently Retired Individuals                         |
+| 2018-07-01T00:00:00.000Z | Family Adventures Travelers                          |
+| 2018-07-01T00:00:00.000Z | Work Comes First Travelers                           |
+| 2018-07-01T00:00:00.000Z | HDTV Researchers                                     |
+
+---
+
 **2) For all of these top 10 interests - which interest appears the most often?**
 
-#### Final Query
+- Let CTE3 be the above output table.
 
+
+#### Final Query
+```` sql
+SELECT interest_name
+FROM (
+    SELECT 
+        interest_name,
+        COUNT(*) AS cnt,
+        DENSE_RANK() OVER (
+            ORDER BY COUNT(*) DESC
+        ) AS dr
+    FROM CTE3
+    GROUP BY interest_name
+) AS temp
+WHERE dr = 1;
+````
 #### Output Table
+
+| interest_name            |
+| ------------------------ |
+| Solar Energy Researchers |
+| Luxury Bedding Shoppers  |
+| Alabama Trip Planners    |
+
+---
  
 **3) What is the average of the average composition for the top 10 interests for each month?**
 
 #### Final Query
-
+```` sql
+SELECT month_year,avg(average_composition)
+FROM (
+    SELECT 
+        month_year,
+        interest_name,
+  		average_composition,
+        ROW_NUMBER() OVER (
+            PARTITION BY month_year 
+            ORDER BY average_composition DESC
+        ) AS rn
+    FROM CTE2
+) AS temp
+WHERE rn < 11
+GROUP BY 1;
+````
 #### Output Table
- 
+
+| month_year               | avg                |
+| ------------------------ | ------------------ |
+| 2018-07-01T00:00:00.000Z | 6.0380000000000000 |
+| 2018-08-01T00:00:00.000Z | 5.9450000000000000 |
+| 2018-09-01T00:00:00.000Z | 6.8950000000000000 |
+| 2018-10-01T00:00:00.000Z | 7.0660000000000000 |
+| 2018-11-01T00:00:00.000Z | 6.6230000000000000 |
+| 2018-12-01T00:00:00.000Z | 6.6520000000000000 |
+| 2019-01-01T00:00:00.000Z | 6.3990000000000000 |
+| 2019-02-01T00:00:00.000Z | 6.5790000000000000 |
+| 2019-03-01T00:00:00.000Z | 6.1680000000000000 |
+| 2019-04-01T00:00:00.000Z | 5.7500000000000000 |
+| 2019-05-01T00:00:00.000Z | 3.5370000000000000 |
+| 2019-06-01T00:00:00.000Z | 2.4270000000000000 |
+| 2019-07-01T00:00:00.000Z | 2.7650000000000000 |
+| 2019-08-01T00:00:00.000Z | 2.6310000000000000 |
+
+---
+
 **4) What is the 3 month rolling average of the max average composition value from September 2018 to August 2019 and include the previous top ranking interests in the same output shown below.**
 
 #### Final Query
+```` sql
+, ANSWER AS (
+    SELECT 
+        month_year,
+        interest_name,
+        average_composition AS max_index_composition,
+        ROUND(
+            AVG(average_composition) OVER (
+                ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+            ),
+            2
+        ) AS "3_month_moving_avg",
+        CONCAT(
+            LAG(interest_name, 1) OVER (ORDER BY month_year),
+            ': ',
+            LAG(average_composition, 1) OVER (ORDER BY month_year)
+        ) AS "1_month_ago",
+        CONCAT(
+            LAG(interest_name, 2) OVER (ORDER BY month_year),
+            ': ',
+            LAG(average_composition, 2) OVER (ORDER BY month_year)
+        ) AS "2_months_ago"
+    FROM (
+        SELECT 
+            CTE2.*,
+            DENSE_RANK() OVER (
+                PARTITION BY month_year 
+                ORDER BY average_composition DESC
+            ) AS dr
+        FROM CTE2
+    ) AS temp
+    WHERE dr = 1
+    ORDER BY month_year
+)
 
+SELECT * 
+FROM ANSWER 
+WHERE month_year > '2018-08-01';
+````
 #### Output Table
- 
-**5) Provide a possible reason why the max average composition might change from month to month? Could it signal something is not quite right with the overall business model for Fresh Segments?**
 
-#### Final Query
+ | month_year               | interest_name                 | max_index_composition | 3_month_moving_avg | 1_month_ago                       | 2_months_ago                      |
+| ------------------------ | ----------------------------- | --------------------- | ------------------ | --------------------------------- | --------------------------------- |
+| 2018-09-01T00:00:00.000Z | Work Comes First Travelers    | 8.26                  | 7.61               | Las Vegas Trip Planners: 7.21     | Las Vegas Trip Planners: 7.36     |
+| 2018-10-01T00:00:00.000Z | Work Comes First Travelers    | 9.14                  | 8.20               | Work Comes First Travelers: 8.26  | Las Vegas Trip Planners: 7.21     |
+| 2018-11-01T00:00:00.000Z | Work Comes First Travelers    | 8.28                  | 8.56               | Work Comes First Travelers: 9.14  | Work Comes First Travelers: 8.26  |
+| 2018-12-01T00:00:00.000Z | Work Comes First Travelers    | 8.31                  | 8.58               | Work Comes First Travelers: 8.28  | Work Comes First Travelers: 9.14  |
+| 2019-01-01T00:00:00.000Z | Work Comes First Travelers    | 7.66                  | 8.08               | Work Comes First Travelers: 8.31  | Work Comes First Travelers: 8.28  |
+| 2019-02-01T00:00:00.000Z | Work Comes First Travelers    | 7.66                  | 7.88               | Work Comes First Travelers: 7.66  | Work Comes First Travelers: 8.31  |
+| 2019-03-01T00:00:00.000Z | Alabama Trip Planners         | 6.54                  | 7.29               | Work Comes First Travelers: 7.66  | Work Comes First Travelers: 7.66  |
+| 2019-04-01T00:00:00.000Z | Solar Energy Researchers      | 6.28                  | 6.83               | Alabama Trip Planners: 6.54       | Work Comes First Travelers: 7.66  |
+| 2019-05-01T00:00:00.000Z | Readers of Honduran Content   | 4.41                  | 5.74               | Solar Energy Researchers: 6.28    | Alabama Trip Planners: 6.54       |
+| 2019-06-01T00:00:00.000Z | Las Vegas Trip Planners       | 2.77                  | 4.49               | Readers of Honduran Content: 4.41 | Solar Energy Researchers: 6.28    |
+| 2019-07-01T00:00:00.000Z | Las Vegas Trip Planners       | 2.82                  | 3.33               | Las Vegas Trip Planners: 2.77     | Readers of Honduran Content: 4.41 |
+| 2019-08-01T00:00:00.000Z | Cosmetics and Beauty Shoppers | 2.73                  | 2.77               | Las Vegas Trip Planners: 2.82     | Las Vegas Trip Planners: 2.77     |
 
-#### Output Table
- 
+- This is the exact output table that danny has provided us. So I guess we have made no mistake.
+
+---
+
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+
+### Anyways Happy Fiddling with the Data. See you in the next case study.
 
  
