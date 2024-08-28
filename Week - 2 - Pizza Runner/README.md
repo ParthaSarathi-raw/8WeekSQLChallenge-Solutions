@@ -1030,3 +1030,10 @@ SELECT * FROM pizza_runner.pizza_recipes;
 
 - So everything is working fine.
 
+---
+
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+
+### Anyways Happy Fiddling with the Data. See you in the next case study.
+
+### Oh wait, this is the final case study. It's been a ride solving all these 8 case studies. Hopefully all these solutions I've provided really came in handy while you're solving these case studies yourself. I wish you all the best in your future endeavours. Peace <3
