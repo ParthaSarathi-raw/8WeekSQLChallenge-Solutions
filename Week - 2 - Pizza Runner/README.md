@@ -910,3 +910,50 @@ SELECT * FROM runner_ratings;
 - Average speed
 - Total number of pizzas
 
+#### Final Query
+
+```` sql
+SELECT 
+    customer_id,
+    CTE.order_id,
+    CTE.runner_id,
+    rating,
+    order_time,
+    pickup_time,
+    EXTRACT(MINUTE FROM pickup_time::TIMESTAMP - order_time) AS time_between_order_and_pickup_in_minutes,
+    duration AS delivery_duration_in_minutes,
+    ROUND(60.0 * distance / duration, 2) AS avg_speed_in_km_per_hr,
+    COUNT(*) AS no_of_pizzas
+FROM CTE
+JOIN runner_ratings r ON CTE.order_id = r.order_id
+WHERE cancellation IS NULL
+GROUP BY 
+    customer_id, 
+    CTE.order_id, 
+    CTE.runner_id, 
+    rating, 
+    order_time, 
+    pickup_time, 
+    duration, 
+    distance
+ORDER BY 
+    customer_id, 
+    CTE.order_id;
+````
+
+#### Output Table
+
+| customer_id | order_id | runner_id | rating | order_time               | pickup_time         | time_between_order_and_pickup_in_minutes | delivery_duration_in_minutes | avg_speed_in_km_per_hr | no_of_pizzas |
+| ----------- | -------- | --------- | ------ | ------------------------ | ------------------- | ---------------------------------------- | ---------------------------- | ---------------------- | ------------ |
+| 101         | 1        | 1         | 5      | 2020-01-01T18:05:02.000Z | 2020-01-01 18:15:34 | 10                                       | 32                           | 37.50                  | 1            |
+| 101         | 2        | 1         | 5      | 2020-01-01T19:00:52.000Z | 2020-01-01 19:10:54 | 10                                       | 27                           | 44.44                  | 1            |
+| 102         | 3        | 1         | 3      | 2020-01-02T23:51:23.000Z | 2020-01-03 00:12:37 | 21                                       | 20                           | 40.20                  | 2            |
+| 102         | 8        | 2         | 5      | 2020-01-09T23:54:33.000Z | 2020-01-10 00:15:02 | 20                                       | 15                           | 93.60                  | 1            |
+| 103         | 4        | 2         | 1      | 2020-01-04T13:23:46.000Z | 2020-01-04 13:53:03 | 29                                       | 40                           | 35.10                  | 3            |
+| 104         | 5        | 3         | 5      | 2020-01-08T21:00:29.000Z | 2020-01-08 21:10:57 | 10                                       | 15                           | 40.00                  | 1            |
+| 104         | 10       | 1         | 5      | 2020-01-11T18:34:49.000Z | 2020-01-11 18:50:20 | 15                                       | 10                           | 60.00                  | 2            |
+| 105         | 7        | 2         | 4      | 2020-01-08T21:20:29.000Z | 2020-01-08 21:30:45 | 10                                       | 25                           | 60.00                  | 1            |
+
+---
+
+**5) If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?**
