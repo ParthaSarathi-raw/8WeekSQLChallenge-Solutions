@@ -966,19 +966,9 @@ ORDER BY
 ```` sql
 SELECT (
 SELECT 
-    SUM(CASE WHEN pizza_id = 1 THEN 12 ELSE 10 END) + SUM(no_of_extras) AS total_amount_earned
+    sum(case when pizza_id = 1 then 12 else 10 end) as "total_amount_made ($)" 
 FROM 
-    CTE 
-LEFT JOIN (
-    SELECT 
-        rn, COUNT(*) AS no_of_extras
-    FROM 
-        extras
-    GROUP BY 
-        rn
-) temp 
-ON 
-    cte.rn = temp.rn
+    CTE
 WHERE cancellation is NULL)
 -
 (SELECT round(0.30*sum(distance),2) as paid_to_runners FROM runner_orders_clean WHERE cancellation is NULL) as left_over_money_in_$   ;
@@ -987,7 +977,7 @@ WHERE cancellation is NULL)
 
 | left_over_money_in_$ |
 | -------------------- |
-| 98.44                |
+| 94.44                |
 
 ---
 
