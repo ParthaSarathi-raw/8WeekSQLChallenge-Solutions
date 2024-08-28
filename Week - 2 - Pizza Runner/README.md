@@ -77,6 +77,7 @@ SELECT * FROM runner_orders_clean;
 - Based on the questions being asked in this section, we can combine `customers_orders_clean`, `runner_orders_clean` and `pizza_runner.pizza_name` into CTE to use it everytime.
 
 ```` sql
+WITH CTE as(
 	SELECT c.*,runner_id,pickup_time,distance,duration,cancellation,pizza_name
 	FROM customers_orders_clean c 
 	JOIN runner_orders_clean r 
@@ -819,13 +820,14 @@ ORDER BY 2 DESC;
 SELECT 
     sum(case when pizza_id = 1 then 12 else 10 end) as "total_amount_made ($)" 
 FROM 
-    customers_orders_clean ;
+    CTE
+WHERE cancellation is NULL;
 ````
 #### Output Table
 
 | total_amount_made ($) |
 | --------------------- |
-| 160                   |
+| 138                   |
 
 ---
 
@@ -837,7 +839,7 @@ FROM
 SELECT 
     SUM(CASE WHEN pizza_id = 1 THEN 12 ELSE 10 END) + SUM(no_of_extras) AS total_amount_earned
 FROM 
-    customers_orders_clean c
+    CTE 
 LEFT JOIN (
     SELECT 
         rn, COUNT(*) AS no_of_extras
@@ -847,14 +849,15 @@ LEFT JOIN (
         rn
 ) temp 
 ON 
-    c.rn = temp.rn;
+    cte.rn = temp.rn
+WHERE cancellation is NULL;
 ````
 
 #### Output Table
 
 | total_amount_earned |
 | ------------------- |
-| 166                 |
+| 142                 |
 
 ---
 
