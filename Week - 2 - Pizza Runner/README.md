@@ -990,3 +990,38 @@ WHERE cancellation is NULL)
 | 98.44                |
 
 ---
+
+## Bonus Question
+
+**If Danny wants to expand his range of pizzas - how would this impact the existing data design? Write an INSERT statement to demonstrate what would happen if a new Supreme pizza with all the toppings was added to the Pizza Runner menu?**
+
+- Since Danny has structed the pizza runner very well, it won't be an issue to add any new pizzas. All our previous queries will work fine with multiple new pizzas added.
+- Just we need to update 2 tables only.
+
+#### Final Query
+```` sql
+INSERT INTO pizza_runner.pizza_names VALUES (3,'Supreme');
+INSERT INTO pizza_runner.pizza_recipes VALUES (3,'1, 2, 3, 4, 5, 6, 7, 8, 9, 10');
+SELECT * FROM pizza_runner.pizza_names;
+SELECT * FROM pizza_runner.pizza_recipes;
+````
+#### Output Table
+
+| pizza_id | pizza_name |
+| -------- | ---------- |
+| 1        | Meatlovers |
+| 2        | Vegetarian |
+| 3        | Supreme    |
+
+
+| pizza_id | toppings                      |
+| -------- | ----------------------------- |
+| 1        | 1, 2, 3, 4, 5, 6, 8, 10       |
+| 2        | 4, 6, 7, 9, 11, 12            |
+| 3        | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 |
+
+### Checking if our queries are working properly or not.
+
+- To check I will add a new order and run the query of Ingredient Optimization Question 4. This is because I believe this is the most complex query that we have created.
+- If this query works perfectly fine, then most probably every thing else works fine.
+
