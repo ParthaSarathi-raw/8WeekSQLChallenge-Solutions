@@ -1024,4 +1024,9 @@ SELECT * FROM pizza_runner.pizza_recipes;
 
 - To check I will add a new order and run the query of Ingredient Optimization Question 4. This is because I believe this is the most complex query that we have created.
 - If this query works perfectly fine, then most probably every thing else works fine.
+- After inserting all the required data we can see that the new pizza is being shown.
+  
+| 11       | Supreme - Exclude Bacon, Onions - Extra Chicken, Mushrooms      |
+
+- So everything is working fine.
 
