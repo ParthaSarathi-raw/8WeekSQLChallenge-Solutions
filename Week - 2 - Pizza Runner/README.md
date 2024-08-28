@@ -857,3 +857,56 @@ ON
 | 166                 |
 
 ---
+
+**3) The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset - generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5.**
+
+#### Final Query
+
+```` sql
+CREATE TABLE runner_ratings (
+  order_id integer,
+  runner_id integer,
+  rating integer,
+  feedback text
+);
+
+INSERT INTO runner_ratings(order_id,runner_id,rating,feedback) values
+(1,1,5,'Delivered on time'),
+(2,1,5,NULL),
+(3,1,3,'Quick delivery but delivery boy was rude'),
+(4,2,1,'Delivered very late and pizza was cold'),
+(5,3,5,'Fast like Flash , I love it'),
+(7,2,4,NULL),
+(8,2,5,'I''m telling you this guy can compete in Moto Grand Prix'),
+(10,1,5,'Blink it and you miss it');
+
+SELECT * FROM runner_ratings;
+````
+
+#### Output Table
+
+| order_id | runner_id | rating | feedback                                                |
+| -------- | --------- | ------ | ------------------------------------------------------- |
+| 1        | 1         | 5      | Delivered on time                                       |
+| 2        | 1         | 5      |                                                         |
+| 3        | 1         | 3      | Quick delivery but delivery boy was rude                |
+| 4        | 2         | 1      | Delivered very late and pizza was cold                  |
+| 5        | 3         | 5      | Fast like Flash , I love it                             |
+| 7        | 2         | 4      |                                                         |
+| 8        | 2         | 5      | I'm telling you this guy can compete in Moto Grand Prix |
+| 10       | 1         | 5      | Blink it and you miss it                                |
+
+---
+
+**4) Using your newly generated table - can you join all of the information together to form a table which has the following information for successful deliveries?**
+- customer_id
+- order_id
+- runner_id
+- rating
+- order_time
+- pickup_time
+- Time between order and pickup
+- Delivery duration
+- Average speed
+- Total number of pizzas
+
