@@ -811,4 +811,49 @@ ORDER BY 2 DESC;
 
 ## Pricing and Ratings
 
+**1) If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?**
 
+#### Final Query
+
+```` sql
+SELECT 
+    sum(case when pizza_id = 1 then 12 else 10 end) as "total_amount_made ($)" 
+FROM 
+    customers_orders_clean ;
+````
+#### Output Table
+
+| total_amount_made ($) |
+| --------------------- |
+| 160                   |
+
+---
+
+**2) What if there was an additional $1 charge for any pizza extras?**
+
+#### Final Query
+
+```` sql
+SELECT 
+    SUM(CASE WHEN pizza_id = 1 THEN 12 ELSE 10 END) + SUM(no_of_extras) AS total_amount_earned
+FROM 
+    customers_orders_clean c
+LEFT JOIN (
+    SELECT 
+        rn, COUNT(*) AS no_of_extras
+    FROM 
+        extras
+    GROUP BY 
+        rn
+) temp 
+ON 
+    c.rn = temp.rn;
+````
+
+#### Output Table
+
+| total_amount_earned |
+| ------------------- |
+| 166                 |
+
+---
