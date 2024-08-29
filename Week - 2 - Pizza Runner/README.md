@@ -6,6 +6,46 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 
 **Note : If you doing this week by week, I suggest you to come to Week 2's case study at the end because this is the most difficut out of all others. However as this will be the last case study I will be attempting, I'm assuming you are already familiar with all the concepts and I will keep my explanation to be minimal. If you still didn't get anything, feel free to leave a comment and I will update my explanation.**
 
+## Index
+
+- [Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#entity-relationship-diagram)
+- [Data Cleaning](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#entity-relationship-diagram)
+- [Pizza Metrics](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#pizza-metrics) \
+[Creation of CTE](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#creation-of-cte)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-2)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-3)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-4)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-5)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-6)
+[8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-7)
+[9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-8)
+[10](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-9)
+- [Runner and Customer Experience](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#runner-and-customer-experience)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-10)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-11)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-12)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-13)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-14)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-15)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-16)
+- [Ingredient Optimization](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#ingredient-optimization)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query--1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-17)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query--2)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-18)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-19)
+- [Pricing and Ratings](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#pricing-and-ratings)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-20)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-21)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-22)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-23)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-24)
+- [Bonus Question](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#bonus-question)
+
+
 ## Entity Relationship Diagram
 
 <img width="587" alt="image" src="https://github.com/user-attachments/assets/2f230655-cd2b-4f25-8882-01c4f4f21517">
