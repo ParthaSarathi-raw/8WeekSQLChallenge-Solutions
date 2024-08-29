@@ -7,6 +7,31 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused**
 
+## Index
+
+
+- [Digital Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#digital-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-2)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-3)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-4)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-5)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-6)
+[8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-7)
+[9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-8)
+- [Product Funnel Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#product-funnel-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-11)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-12)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-13)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-14)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-15)
+- [Campaign Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#campaigns-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-17)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-18)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-19)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait#final-query-20)
+
 ## Digital Analysis
 
 **1) How many users are there?**
