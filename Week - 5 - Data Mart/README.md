@@ -7,6 +7,26 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused**
 
+## Index
+
+- [Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#entity-relationship-diagram)
+- [Data Cleansing Steps](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#data-cleansing-steps)
+- [Data Exploration](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#data-exploration) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-1)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-2)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-3)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-4)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-5)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-6)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-7)
+[8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-8)
+[9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-9)
+- [Before and After Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#before-and-after-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-4)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-5)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-6)
+- [Bonus Question](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#bonus-question) 
+
 ## Entity Relationship Diagram
 
 <img width="248" alt="image" src="https://github.com/user-attachments/assets/ba2308e4-f7bd-4e06-8ee0-13da746b041f">
