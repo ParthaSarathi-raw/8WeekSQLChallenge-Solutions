@@ -7,6 +7,11 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused**
 
+## Index
+
+[Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#entity-relationship-diagram).
+[Creation of CTE](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#creation-of-cte).
+
 ## Entity Relationship Diagram
 ![image](https://github.com/user-attachments/assets/f1971f06-eba6-4976-9294-0ed5b94d5621)
 
