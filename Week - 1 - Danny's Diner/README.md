@@ -16,6 +16,12 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 [2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-1)
 [3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-3)
 [4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-5)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-6)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-7)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-8)
+[8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-9)
+[9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-10)
+[10](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-11)
 
 ## Entity Relationship Diagram
 ![image](https://github.com/user-attachments/assets/f1971f06-eba6-4976-9294-0ed5b94d5621)
