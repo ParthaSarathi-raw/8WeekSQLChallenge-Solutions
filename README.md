@@ -1,6 +1,6 @@
 # 8-Week SQL Challenge Solutions
 
-In this repository you can find all the dannys 8 Week Sql Challenge solutions which requires to write SQL queries. 
+In this repository you can find all the Danny's 8 Week Sql Challenge solutions which involves writing SQL queries. 
 
 You might be wondering that there are multiple solutions already available online. So what what makes mine special? 
 
