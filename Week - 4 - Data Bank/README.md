@@ -6,6 +6,28 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem.**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused.**
 
+
+## Index
+
+- [Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#entity-relationship-diagram)
+- [Customer Nodes Exploration](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#customer-nodes-exploration-solutions) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-2)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-using-approach-2)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-3)
+- [Customer Transactions](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#customer-transactions-solutions) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-4)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-5)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-6)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-7)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-8)
+- [Data Allocation Challenge](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#data-allocation-challenge) \
+[Data Allocation Done Real Time](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#data-allocation-done-real-time) \
+[Data Allocation Based on Prev Months Balance](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#data-allocation-done-based-on-previous-months-balance) \
+[Data Allocation Based on Average Balance in Prev 30 Days](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#data-allocation-based-on-average-balance-in-previous-30-days)
+
+
 ## Entity Relationship Diagram
 <img width="532" alt="image" src="https://github.com/user-attachments/assets/3d07fdd4-73d6-464b-adf8-02e8280618cc">
 <br>
@@ -1215,6 +1237,10 @@ GROUP BY 1;
 - Keep this in mind, if we have more information on this, we can calculate even more accurate answer. But for this question I'm moving forward with the first assumption that every customer is already part of data_bank and has 0 as their cur_balance from 1st of January, 2020.
 
 ---
+
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+
+### Anyways Happy Fiddling with the Data. See you in the next case study.
 
 ### Extra Challenge and Extension Request
 - For the extra challenge, I'm not really familiar with all the annual compound calculations etc, but I think they are just implementation of mathematical calculations and nothing tricky sql is needed, so I'm comfortable skipping it.
