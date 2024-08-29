@@ -9,8 +9,13 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 
 ## Index
 
-[Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#entity-relationship-diagram).
-[Creation of CTE](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#creation-of-cte).
+- [Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#entity-relationship-diagram)
+- [Creation of CTE](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#creation-of-cte)
+- [Solutions](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#solutions)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-3)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner#final-query-5)
 
 ## Entity Relationship Diagram
 ![image](https://github.com/user-attachments/assets/f1971f06-eba6-4976-9294-0ed5b94d5621)
