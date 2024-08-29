@@ -4,7 +4,7 @@ In this repository you can find all the Danny's 8 Week Sql Challenge solutions w
 
 You might be wondering that there are multiple solutions already available online. So what what makes mine special? 
 
-I will list out the points on what makes my solutions unique :
+## What makes my solutions unique :
 
 - All my solutions can be run at DBFIDDLE with POSTGRE SQL V 13 whose link is provided in each case study. So even if you practice on other dialects, you can cross check my solution on dbfiddle and try to apply the same logic in your sql dialect.
 
