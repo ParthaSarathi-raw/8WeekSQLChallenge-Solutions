@@ -343,6 +343,8 @@ LIMIT 1;
  
 **1) What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?**
 
+#### Final Query
+
 ```` sql
 ,before_and_after_analysis AS (
     SELECT 
@@ -364,6 +366,8 @@ SELECT
 FROM before_and_after_analysis;
 ````
 
+#### Output Table
+
 | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------ | ----------- | -------------- | ------------------- |
 | 2345878357   | 2318994169  | -26884188      | -1.15               |
@@ -371,6 +375,8 @@ FROM before_and_after_analysis;
 ---
 
 **2) What about the entire 12 weeks before and after?**
+
+#### Final Query
 
 ```` sql
 ,before_and_after_analysis AS (
@@ -393,6 +399,8 @@ SELECT
 FROM before_and_after_analysis;
 ````
 
+#### Output Table
+
 | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------ | ----------- | -------------- | ------------------- |
 | 7126273147   | 6973947753  | -152325394     | -2.14               |
@@ -402,6 +410,8 @@ FROM before_and_after_analysis;
 **3) How do the sale metrics for these 2 periods before and after compare with the previous years in 2018 and 2019?**
 
 - Checking the trend for 4 weeks before and after for each year.
+
+#### Final Query 1
 
 ```` sql
 ,before_and_after_analysis AS (
@@ -426,6 +436,7 @@ SELECT
     ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
 FROM before_and_after_analysis ORDER BY 1;
 ````
+#### Output Table 1
 
 | calender_year | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------- | ------------ | ----------- | -------------- | ------------------- |
@@ -436,6 +447,8 @@ FROM before_and_after_analysis ORDER BY 1;
 ---
 
 - Checking the trend for 12 weeks before and after for each year.
+
+#### Final Query 2
 
 ```` sql
 ,before_and_after_analysis AS (
@@ -460,6 +473,9 @@ SELECT
     ROUND(100.0 * (after_sales - before_sales) / before_sales, 2) AS variance_percentage
 FROM before_and_after_analysis;
 ````
+
+#### Output Table 2
+
 | calender_year | before_sales | after_sales | sales_variance | variance_percentage |
 | ------------- | ------------ | ----------- | -------------- | ------------------- |
 | 2018          | 6396562317   | 6500818510  | 104256193      | 1.63                |
