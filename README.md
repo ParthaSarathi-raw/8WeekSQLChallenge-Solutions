@@ -10,7 +10,7 @@ I will list out the points on what makes my solutions unique :
 
 - For Case Study 1, I have implemented the solutions to the question in different approaches with full detailed intuition on how to solve the problem with detailed explanations because as a beginner I really want you to understand different ways in which you can solve the same problem.
 
-- For Case Study 2, I've mentioned a note that it is better to solve this case study at the last after completing all the 6 remaining case studies. This is because the level of questions and data increases dramatically in this case study and if you're a beginner, you might really feel discouraged while solving this case study. Hence I advice you to please solve this after finishing all other case studies
+- For Case Study 2, I've mentioned a note that it is better to solve this case study at the last after completing all the remaining case studies. This is because the level of questions increases dramatically in this case study 2 when compared to previous case study 1 and if you're a beginner, you might really feel discouraged while solving this case study. Hence I advice you to please solve this after finishing all other case studies
 
 - Also for Case Study 2, I've seen multiple resoures which are blantly providing completely wrong solutions or simply ignoring the questions for **Ingredient Optimizaiton, Pricing and Ratings , Bonus Question** sections. In my case study I have provided correct solutions to each and every one of these sections.
 
