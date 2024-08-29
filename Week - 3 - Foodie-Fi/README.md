@@ -6,6 +6,28 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem.**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused.**
 
+
+## Index
+
+- [Entity Relationship Diagram](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#entity-relationship-diagram)
+- [Creation of CTE](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#creation-of-cte)
+- [Data Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#data-analysis-solutions) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-2)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-3)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-4)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-5)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-6)
+[8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-7)
+[9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-8)
+[10](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#approach-1--using-case-statements)
+[11](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#final-query-10)
+- [Challenge Payment Solution](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi#challenge-payment-solution) 
+
+
+
+
 ## Entity Relationship Diagram
 <img width="493" alt="image" src="https://github.com/user-attachments/assets/0ee18517-5e6a-4516-8b15-84b31215d7ed">
 <br>
