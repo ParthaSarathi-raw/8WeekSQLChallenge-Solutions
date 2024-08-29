@@ -25,3 +25,17 @@ You might be wondering that there are multiple solutions already available onlin
 - For Case Study 7, I've attempted **Reporting Challenge and Bonus Challenge** sections as well. Also I've kept my explanations to be very minimal from now on since you should be at intermediate level by now. However if you still need further explanations, please reach out to me and I will update my solutions with detailed explanations.
 
 - For Case Study 8, I've provided solutions for all 4 questions in the **Index Analysis** section as well which I've seen everyone usually skip those before while I was solving this case study for the first time myself.
+
+## Table of Contents
+
+Please click on any case study to view the solutions of that case study.
+
+- [Case Study 1 : Danny's Diner](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%201%20-%20Danny's%20Diner)
+- [Case Study 2 : Pizza Runner](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner)
+- [Case Study 3 : Foodie Fi](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%203%20-%20Foodie-Fi)
+- [Case Study 4 : Data Bank](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank)
+- [Case Study 5 : Data Mart](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart)
+- [Case Study 6 : Clique Bait](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%206%20-%20Clique%20Bait)
+- [Case Study 7 : Balanced Tree Clothing Co.](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.)
+- [Case Study 8 : Fresh Segments](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments)
+
