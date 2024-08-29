@@ -22,9 +22,9 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 [8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-8)
 [9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-9)
 - [Before and After Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#before-and-after-analysis) \
-[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-4)
-[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-5)
-[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%204%20-%20Data%20Bank#final-query-6)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-10)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-11)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#final-query-1-1)
 - [Bonus Question](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%205%20-%20Data%20Mart#bonus-question) 
 
 ## Entity Relationship Diagram
