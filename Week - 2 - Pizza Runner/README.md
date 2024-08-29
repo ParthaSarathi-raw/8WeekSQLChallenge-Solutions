@@ -22,7 +22,7 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 [8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-7)
 [9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-8)
 [10](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-9)
-- [Runner and Customer Experience](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#runner-and-customer-experience)
+- [Runner and Customer Experience](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#runner-and-customer-experience) \
 [1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-10)
 [2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-11)
 [3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-12)
@@ -30,14 +30,14 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 [5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-14)
 [6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-15)
 [7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-16)
-- [Ingredient Optimization](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#ingredient-optimization)
+- [Ingredient Optimization](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#ingredient-optimization) \
 [1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-)
 [2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query--1)
 [3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-17)
 [4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query--2)
 [5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-18)
 [6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-19)
-- [Pricing and Ratings](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#pricing-and-ratings)
+- [Pricing and Ratings](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#pricing-and-ratings) \
 [1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-20)
 [2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-21)
 [3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%202%20-%20Pizza%20Runner#final-query-22)
