@@ -1026,4 +1026,4 @@ SELECT * FROM pizza_runner.pizza_recipes;
 
 ### Anyways Happy Fiddling with the Data. See you in the next case study.
 
-### Oh wait, this is the final case study. It's been a ride solving all these 8 case studies. Hopefully all these solutions I've provided really came in handy while you're solving these case studies yourself. I wish you all the best in your future endeavours. Peace <3
+### Oh wait, this is the final case study since I've solved everything else and I hope you're doing this case study at the last too. It's been a ride solving all these 8 case studies. Hopefully all these solutions I've provided really came in handy while you're solving these case studies yourself. I wish you all the best in your future endeavours. Peace <3
