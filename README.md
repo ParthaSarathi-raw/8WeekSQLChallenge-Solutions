@@ -18,4 +18,10 @@ I will list out the points on what makes my solutions unique :
 
 - For Case Study 4, I've provided detailed explanations, but especially for the **4th Question of Customer Nodes Exploration** section, I've provided **correct solution**. But I've seen each and every resource provide **wrong solution** to this question. Hence this really stands out from all other solutions that are available online. Also I've attempted **Data Allocation Challenge** as well for this case study.
 
-- 
+- For Case Study 5, I've kept my explanation to minimal, by mininal I don't mean no explanation but just that really short and sweet explanation of how I got the logic etc like that. I'm expecting you to be not a beginner by now which is why I didn't explain each and every small thing. I've also attempted **Before and After Analysis, Bonus Question** for this case study.
+
+- For Case Study 6, I've seen multiple resources where they've skipped **Campaign Analysis** section. I made sure to include those solutions as well in this repository.
+
+- For Case Study 7, I've attempted **Reporting Challenge and Bonus Challenge** sections as well. Also I've kept my explanations to be very minimal from now on since you should be at intermediate level by now. However if you still need further explanations, please reach out to me and I will update my solutions with detailed explanations.
+
+- For Case Study 8, I've provided solutions for all 4 questions in the **Index Analysis** section as well which I've seen everyone usually skip those before while I was solving this case study for the first time myself.
