@@ -7,6 +7,34 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 **You can directly skip to code block to directly view the solution. However if you are stuck understanding something I suggest you to read my approach on how I tackled the problem**\
 **Also please run the code blocks youself on dbfiddle as you can look at the output and follow through my explanations when you are confused**
 
+## Index
+
+- [High Level Sales Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#high-level-sales-analysis) \
+[Creation of CTE](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#creation-of-cte)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-2)
+- [Transaction Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#transaction-analysis)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-3)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-4)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-5)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-6)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-7)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-8)
+- [Product Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#product-analysis)
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-9)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-10)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-11)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-12)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-13)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-14)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-15)
+[8](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-16)
+[9](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-17)
+[10](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#final-query-18)
+- [Reporting Challenge](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#reporting-challenge)
+- [Bonus Challenge](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%207%20-%20%20Balanced%20Tree%20Clothing%20Co.#bonus-challenge)
+
 ## High Level Sales Analysis
 
 ### Creation of CTE
