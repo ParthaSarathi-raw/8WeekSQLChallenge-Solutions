@@ -28,7 +28,7 @@ You might be wondering that there are multiple solutions already available onlin
 
 **Suggestion : I would suggest to practice case study 2 after completing all other remaining case studies because of it's difficulty level.**
 
-## Table of Contents
+## Index
 
 Please click on any case study to view the solutions of that case study.
 
