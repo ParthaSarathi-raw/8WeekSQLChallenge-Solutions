@@ -6,7 +6,7 @@ You might be wondering that there are multiple solutions already available onlin
 
 ## What makes my solutions unique :
 
-- All my solutions can be run at DBFIDDLE with POSTGRE SQL V 13 whose link is provided in each case study. So even if you practice on other dialects, you can cross check my solution on dbfiddle and try to apply the same logic in your sql dialect.
+- All my solutions can be run at DBFIDDLE with POSTGRE SQL V 13 whose link is provided in each case study. So there is no need to import the data and do it somewhere else as inside DBFiddle all the data is already available. DBFiddle works great and I suggest you practice there itself.
 
 - For Case Study 1, I have implemented the solutions to the questions in different approaches with intuition on how to solve the problem and with detailed explanations because as a beginner I really want you to understand different ways in which you can solve the same problem.
 
