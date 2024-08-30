@@ -6,6 +6,35 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 
 - Few questions in the case study are descriptive, so I've skipped those questions since SQL is not necessary for them.
 
+## Index
+
+- [Data Exploration and Cleaning](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#data-exploration-and-cleaning) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-1)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-2)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-3)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-4)
+[6](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-5)
+[7](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-6)
+- [Interest Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#interest-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-7)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-8)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-9)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-10)
+[5](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-11)
+- [Segment Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#segment-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-12)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-13)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-14)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-15)
+- [Index Analysis](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#index-analysis) \
+[1](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-16)
+[2](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-17)
+[3](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-18)
+[4](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments#final-query-19)
+
+
+
 ## Data Exploration and Cleaning
 
 **1) Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month**
