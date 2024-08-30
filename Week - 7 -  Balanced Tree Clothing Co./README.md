@@ -719,6 +719,6 @@ FROM
 
 ---
 
-### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, just drop a message. It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
+### Please feel free to let me know if I have made any mistake or if you know a better approach to solve any question. If this helped you in anyway to improve your skills, please reach out to me at rishik130406@gmail.com . It might not mean much to you, but it absolutely makes my day when I know that I’ve helped someone gain some knowledge.
 
 ### Anyways Happy Fiddling with the Data. See you in the next case study.
