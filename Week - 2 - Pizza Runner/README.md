@@ -6,7 +6,7 @@ And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com
 
 **Note : If you doing this week by week, I suggest you to come to Week 2's case study at the end because this is the most difficut out of all others.**
 
-**However as this will be the last case study I will be attempting, I'm assuming you are already familiar with all the concepts and I will keep my explanation to be minimal as you already completed all other 7 case studies. If you still didn't get anything, feel free to leave a comment and I will update my explanation.**
+**However as this will be the last case study I will be attempting, I'm assuming you are already familiar with all the concepts and I will keep my explanation to be minimal as you already completed all other 7 case studies. If you still didn't get anything, feel free to reach out to me through mail and I will update my explanation.**
 
 ## Index
 
