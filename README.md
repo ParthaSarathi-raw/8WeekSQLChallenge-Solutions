@@ -16,7 +16,7 @@ You might be wondering that there are multiple solutions already available onlin
 
 - For Case Study 3, I've provided very detailed explanations in multiple approaches for every question. Also for the **10th Question** I've seen people use case statements which hard codes the values and doesn't work when new data is added. So I've provided the generalized query to solve that question which does not use bunch of case statements. And I've also solved **Challenge Payment** Question which many of other resources have skipped.
 
-- For Case Study 4, I've provided detailed explanations, but especially for the **4th Question of Customer Nodes Exploration** section, I've provided **correct solution**. But I've seen each and every resource provide **wrong solution** to this question. Hence this really stands out from all other solutions that are available online. Also I've attempted **Data Allocation Challenge** as well for this case study.
+- For Case Study 4, I've provided detailed explanations, especially for the **4th Question of Customer Nodes Exploration** section, I've provided **correct solution**. But I've seen each and every resource provide **wrong solution** to this question. Hence this really stands out from all other solutions that are available online. Also I've attempted **Data Allocation Challenge** as well for this case study.
 
 - For Case Study 5, I've kept my explanation to minimal, by mininal I don't mean no explanation but just that really short and sweet explanation of how I got the logic etc like that. I'm expecting you to be not a beginner by now which is why I didn't explain each and every small thing. I've also attempted **Before and After Analysis, Bonus Question** for this case study.
 
