@@ -8,7 +8,7 @@ You might be wondering that there are multiple solutions already available onlin
 
 - All my solutions can be run at DBFIDDLE with POSTGRE SQL V 13 whose link is provided in each case study. So even if you practice on other dialects, you can cross check my solution on dbfiddle and try to apply the same logic in your sql dialect.
 
-- For Case Study 1, I have implemented the solutions to the question in different approaches with full detailed intuition on how to solve the problem with detailed explanations because as a beginner I really want you to understand different ways in which you can solve the same problem.
+- For Case Study 1, I have implemented the solutions to the questions in different approaches with intuition on how to solve the problem and with detailed explanations because as a beginner I really want you to understand different ways in which you can solve the same problem.
 
 - For Case Study 2, I've mentioned a note that it is better to solve this case study at the last after completing all the remaining case studies. This is because the level of questions increases dramatically in this case study 2 when compared to previous case study 1 and if you're a beginner, you might really feel discouraged while solving this case study. Hence I advice you to please solve this after finishing all other case studies
 
