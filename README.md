@@ -26,6 +26,8 @@ You might be wondering that there are multiple solutions already available onlin
 
 - For Case Study 8, I've provided solutions for all 4 questions in the **Index Analysis** section as well which I've seen everyone usually skip those before while I was solving this case study for the first time myself.
 
+**Suggestion : I would suggest to practice case study 2 after completing all other remaining case studies.**
+
 ## Table of Contents
 
 Please click on any case study to view the solutions of that case study.
