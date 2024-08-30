@@ -4,7 +4,9 @@ All the data and questions that I've answered in this markdown can be found at  
 
 And all my solutions have been executed at [DB Fiddle](https://www.db-fiddle.com/f/7VcQKQwsS3CTkGRFG7vu98/65) using POSTGRE SQL V 13. If you get any kind of errors when you are executing my queries given below, you might be using some other dialect of SQL other than postgre sql v 13. Please look up alternate ways to achieve the same thing on your SQL dialect. However I do prefer just practising these questions on DB Fiddle itself.
 
-**Note : If you doing this week by week, I suggest you to come to Week 2's case study at the end because this is the most difficut out of all others. However as this will be the last case study I will be attempting, I'm assuming you are already familiar with all the concepts and I will keep my explanation to be minimal. If you still didn't get anything, feel free to leave a comment and I will update my explanation.**
+**Note : If you doing this week by week, I suggest you to come to Week 2's case study at the end because this is the most difficut out of all others.**
+
+**However as this will be the last case study I will be attempting, I'm assuming you are already familiar with all the concepts and I will keep my explanation to be minimal as you already completed all other 7 case studies. If you still didn't get anything, feel free to leave a comment and I will update my explanation.**
 
 ## Index
 
