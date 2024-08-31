@@ -45,6 +45,11 @@ FULL OUTER JOIN dannys_diner.menu men ON s.product_id = men.product_id
 ORDER BY s.customer_id,order_date)
 SELECT * FROM cte;
 ````
+- Full Outer Join between Sales and Members Table because , sales table has data for each and every product sold for both members and non members. So if we do normal join, we only get sales for members only because non members are not included in the members table. Hence it is better to do LEFT JOIN or FULL OUTER JOIN here.
+
+- Full Outer Join Between Sales and Menu because, menu table has data for all the products, but it doesn't mean that each and every product was ordered at least once. So if we do normal join there might be chance that we could miss few products on menu that were never ordered. Hence it is better to do RIGHT JOIN or FULL OUTER JOIN here.
+
+
 #### Base CTE Table
 
 | customer_id | order_date               | product_id | join_date                | product_name | price |
