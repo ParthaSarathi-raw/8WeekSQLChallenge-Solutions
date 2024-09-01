@@ -42,3 +42,5 @@ Please click on any case study to view the solutions of that case study.
 - [Case Study 8 : Fresh Segments](https://github.com/ParthaSarathi-raw/8WeekSQLChallenge-Solutions/tree/main/Week%20-%208%20-%20Fresh%20Segments)
 
 **Note : If you find any mistake or know a better solution to solve any question, or if this repository helped you in anyway to gain some knowledge, please reach out to me at rishik130406@gmail.com for any feedback.**
+
+**Make sure to share this with your friends if you find this repository helpful !**
