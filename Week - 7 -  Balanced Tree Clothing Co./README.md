@@ -642,6 +642,8 @@ ORDER BY
 
 **Hint: you may want to consider using a recursive CTE to solve this problem!**
 
+### Without Using RECURSIVE CTE
+
 #### Final Query
 ```` sql
 WITH cte AS (
@@ -716,6 +718,46 @@ FROM
 | f084eb     | 36    | Navy Solid Socks - Mens          | 2           | 6          | 16       | Mens          | Socks        | Navy Solid          |
 | b9a74d     | 17    | White Striped Socks - Mens       | 2           | 6          | 17       | Mens          | Socks        | White Striped       |
 | 2feb6b     | 29    | Pink Fluro Polkadot Socks - Mens | 2           | 6          | 18       | Mens          | Socks        | Pink Fluro Polkadot |
+
+
+### With using RECURSIVE CTE
+
+- To be honest I solved this question without using RECURSIVE CTE at first and later I got to know that there is something known as RECURSIVE CTE that we can use to solve this problem.
+- This is my first time implementing recursive CTE, so I'm not really sure how can I even optimise this. Because with using Recursive CTE and without using recursive CTE, I'm able to generate the same output, but I feel that both processes I did are kind of lengthy.
+- I feel like with help of RECURSIVE CTE the problem could be solved much easily but I'm not able to find the solution
+- So If you please know how to properly use RECURSIVE CTE to our advantage, please let me know, Thank You.
+
+```` sql
+WITH RECURSIVE CTE AS (
+    SELECT temp.*, 1 AS level 
+    FROM balanced_tree.product_hierarchy temp
+    WHERE id IN (1, 2)
+    UNION 
+    SELECT h.id, h.parent_id, h.level_text, h.level_name, level + 1 AS level
+    FROM CTE
+    JOIN balanced_tree.product_hierarchy h
+    ON CTE.id = h.parent_id
+),
+CTE2 AS (
+    SELECT c.id AS category_id, segment_id, style_id, c.level_text AS category_name, segment_name, style_name
+    FROM (
+        SELECT a.id AS style_id, a.parent_id AS segment_id, a.level_text AS style_name, b.level_text AS segment_name
+        FROM CTE a
+        JOIN CTE b
+        ON a.parent_id = b.id AND a.level = 3 AND b.level = 2
+    ) temp
+    JOIN CTE c
+    ON temp.parent_id = c.id
+)
+
+SELECT product_id, price, CONCAT(style_name, ' ', segment_name, ' - ', category_name) AS product_name,
+       category_id, segment_id, style_id, category_name, segment_name, style_name
+FROM balanced_tree.product_prices p
+JOIN CTE2
+ON p.id = CTE2.style_id
+ORDER BY p.id;
+````
+- Output would be same table.
 
 ---
 
